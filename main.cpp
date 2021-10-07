@@ -6,14 +6,21 @@
 #include <thread>
 #include <chrono>
 
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_RESET   "\x1b[0m"
+
 using namespace std;
 
 int main(int argc, char** argv) {
-    if(argc != 2){
-        cout << "Inserisci il pid" << endl;
-        return 1;
+    string pid;
+    if(argc == 1){
+        ifstream pidFile("rtos_pid.txt");
+        getline(pidFile, pid);
+        pidFile.close();
     }
-    string pid = string(argv[1]);
+    else {
+        pid = string(argv[1]);
+    }
     ifstream mapfile;
     mapfile.open("/proc/" + pid + "/maps");
     if(!mapfile.is_open()){
@@ -32,6 +39,7 @@ int main(int argc, char** argv) {
         }
     }
     mapfile.close();
+    cout << (endAddr - startAddr) / 1024 << "KB di heap allocato" << endl;
     if(startAddr == -1) {
         cout << "Heap not found" << endl;
         return 3;
@@ -49,15 +57,33 @@ int main(int argc, char** argv) {
     random_device generator;
     uniform_int_distribution<long> addressDistribution(startAddr, endAddr);
     uniform_int_distribution<int> bit_distribution(0,7);
-    for (int i = 0; i < 100; ++i) {
-        long addr = addressDistribution(generator);
-        memFile.seekg(addr);
+    bool flag = false;
+    for (int i = 0; i < 60; ++i) {
         uint8_t byte, mask = bit_distribution(generator);
-        byte = memFile.peek();
-        memFile.put(byte ^ (1 << mask));
+        long addr;
+        do {
+            addr = addressDistribution(generator);
+            memFile.seekg(addr);
+            byte = memFile.peek();
+        } while(byte == 0 || byte == 165);
+        if(byte == 255)
+            if(flag)
+                break;
+            else
+                flag = true;
+        else
+            flag = false;
+        //Flipbit
+        byte ^= 1 << mask;
+
         memFile.seekg(addr);
-        cout << "Modified " << bitset<8>(byte) << " at " << addr << endl;
-        this_thread::sleep_for(chrono::milliseconds(200));
+        memFile.put((char)byte);
+
+        cout << "Modified " <<
+        // put red color for the bit flipped
+        bitset<8>(byte).to_string().insert(mask + 1, COLOR_RESET).insert(mask, COLOR_RED)
+        << " at 0x" << hex << addr << endl;
+        this_thread::sleep_for(chrono::milliseconds(500));
     }
     memFile.close();
     return 0;
