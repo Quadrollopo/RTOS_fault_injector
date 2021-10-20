@@ -98,8 +98,8 @@
 
 /* The rate at which data is sent to the queue.  The times are converted from
 milliseconds to ticks using the pdMS_TO_TICKS() macro. */
-#define mainTASK_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 200UL )
-#define mainTIMER_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 2000UL )
+#define mainTASK_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 1000UL )
+#define mainTIMER_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 10000UL )
 
 /* The number of items the queue can hold at once. */
 #define mainQUEUE_LENGTH					( 2 )
@@ -146,15 +146,15 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 	{
 		/* Start the two tasks as described in the comments at the top of this
 		file. */
-		xTaskCreate( myReceiver, /*prvQueueReceiveTask,*/			/* The function that implements the task. */
+		xTaskCreate( /*myReceiver,*/ prvQueueReceiveTask,			/* The function that implements the task. */
 					"Receiver", 							/* The text name assigned to the task - for debug only as it is not used by the kernel. */
 					configMINIMAL_STACK_SIZE, 		/* The size of the stack to allocate to the task. */
 					NULL, 							/* The parameter passed to the task - not used in this simple case. */
 					mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority assigned to the task. */
 					NULL );							/* The task handle is not required, so NULL is passed. */
 
-		//xTaskCreate( prvQueueSendTask, "TX1", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-        xTaskCreate( mySender, /*prvQueueSendTask,*/ "Sender", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+		xTaskCreate( prvQueueSendTask, "TX1", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+        //xTaskCreate( mySender, /*prvQueueSendTask,*/ "Sender", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
 		/* Create the software timer, but don't start it yet. */
 		xTimer = xTimerCreate( "Timer",				/* The text name assigned to the software timer - for debug only as it is not used by the kernel. */
@@ -217,10 +217,20 @@ const uint32_t msg[2] = {ulValueToSend, (uint32_t)name};
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
-
+    int n = 0;
+    int ch = 97;
+    char *heapSpace = NULL;
 	for( ;; )
 	{
+        n++;
+        heapSpace = realloc(heapSpace, n*sizeof(char));
+        heapSpace[n-1] = (char) ch;
+        ch++;
+
+        console_print("Indirizzo Stringa: %lx\nStringa: %s\n", &heapSpace, heapSpace);
         console_print("sending message from %s\n", (char *)msg[1]);
+
+        if(ch == 122) ch = 97;
 		/* Place this task in the blocked state until it is time to run again.
 		The block time is specified in ticks, pdMS_TO_TICKS() was used to
 		convert a time specified in milliseconds into a time specified in ticks.
@@ -231,7 +241,7 @@ const uint32_t msg[2] = {ulValueToSend, (uint32_t)name};
 		write to the console.  0 is used as the block time so the send operation
 		will not block - it shouldn't need to block as the queue should always
 		have at least one space at this point in the code. */
-		xQueueSend( xQueue, msg, 0U );
+		xQueueSend( xQueue, msg, 100U );
 	}
 }
 /*-----------------------------------------------------------*/
@@ -261,9 +271,12 @@ uint32_t ulReceivedValue[2];
 
 	/* Prevent the compiler warning about the unused parameter. */
 	( void ) pvParameters;
-
-	for( ;; )
+    char *stringTimer = NULL;
+    int i = 10;
+	int j = 0;
+    for( ;; )
 	{
+
 		/* Wait until something arrives in the queue - this task will block
 		indefinitely provided INCLUDE_vTaskSuspend is set to 1 in
 		FreeRTOSConfig.h.  It will not use any CPU time while it is in the
@@ -278,10 +291,15 @@ uint32_t ulReceivedValue[2];
 		console output) from a FreeRTOS task. */
 		if( ulReceivedValue[0] == mainVALUE_SENT_FROM_TASK )
 		{
-			console_print( "Message received from task %s\n", (char *)ulReceivedValue[1] );
+			console_print( "Message received: %d from task %s\n", ulReceivedValue[0], (char *)ulReceivedValue[1] );
 		}
 		else if( ulReceivedValue[0] == mainVALUE_SENT_FROM_TIMER )
 		{
+            stringTimer = malloc(i * sizeof(char));
+            for(j = 0; j<i; j++)
+                stringTimer[j] = "T";
+            i++;
+            console_print("Indirizzo stringa del timer: %lx\nStringa del timer: %s\n", &stringTimer, stringTimer);
 			console_print( "Message received from software timer\n" );
 		}
 		else
