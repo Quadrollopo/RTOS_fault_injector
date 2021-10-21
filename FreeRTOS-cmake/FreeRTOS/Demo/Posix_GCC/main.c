@@ -120,6 +120,11 @@ static BaseType_t xTraceRunning = pdTRUE;
 
 int main( void )
 {
+
+    //save the pid for debug purpose
+    FILE *f = fopen("rtos_pid.txt", "w");
+    fprintf(f, "%d", getpid());
+    fclose(f);
     /* Do not include trace code when performing a code coverage analysis. */
     #if ( projCOVERAGE_TEST != 1 )
     {
