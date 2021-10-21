@@ -219,18 +219,18 @@ const uint32_t msg[2] = {ulValueToSend, (uint32_t)name};
 	xNextWakeTime = xTaskGetTickCount();
     int n = 0;
     int ch = 97;
-    char *heapSpace = NULL;
+    char *heapSpace;
+    heapSpace = malloc(200* sizeof(char));
 	for( ;; )
 	{
-        n++;
-        heapSpace = realloc(heapSpace, n*sizeof(char));
-        heapSpace[n-1] = (char) ch;
+        heapSpace[n] = (char) ch;
         ch++;
-
+        n++;
+        if(n==200) n = 0;
         console_print("Indirizzo Stringa: %lx\nStringa: %s\n", &heapSpace, heapSpace);
         console_print("sending message from %s\n", (char *)msg[1]);
 
-        if(ch == 122) ch = 97;
+        if(ch == 123) ch = 97;
 		/* Place this task in the blocked state until it is time to run again.
 		The block time is specified in ticks, pdMS_TO_TICKS() was used to
 		convert a time specified in milliseconds into a time specified in ticks.
@@ -271,9 +271,7 @@ uint32_t ulReceivedValue[2];
 
 	/* Prevent the compiler warning about the unused parameter. */
 	( void ) pvParameters;
-    char *stringTimer = NULL;
-    int i = 10;
-	int j = 0;
+
     for( ;; )
 	{
 
@@ -295,11 +293,7 @@ uint32_t ulReceivedValue[2];
 		}
 		else if( ulReceivedValue[0] == mainVALUE_SENT_FROM_TIMER )
 		{
-            stringTimer = malloc(i * sizeof(char));
-            for(j = 0; j<i; j++)
-                stringTimer[j] = "T";
-            i++;
-            console_print("Indirizzo stringa del timer: %lx\nStringa del timer: %s\n", &stringTimer, stringTimer);
+            console_print("Indirizzo del timer: %lx\nS", xTimer);
 			console_print( "Message received from software timer\n" );
 		}
 		else
