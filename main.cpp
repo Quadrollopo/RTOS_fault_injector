@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 
         cout << "Modified " <<
         // put red color for the bit flipped
-        bitset<8>(byte).to_string().insert(mask + 1, COLOR_RESET).insert(mask, COLOR_RED)
+        bitset<8>(byte).to_string().insert(8 - mask, COLOR_RESET).insert(7 - mask, COLOR_RED)
         << " at 0x" << hex << addr << endl;
         this_thread::sleep_for(chrono::milliseconds(500));
     }
