@@ -181,7 +181,7 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 }
 /*-----------------------------------------------------------*/
 
-static void mySender(void *params) {
+/*static void mySender(void *params) {
   (void*)params;
   int i = 0;
   while (1) {
@@ -200,7 +200,7 @@ static void myReceiver(void* params) {
     printf("Receiver task reading %d\n", i);
     vTaskDelay(1000);
   }
-}
+}*/
 
 
 static void prvQueueSendTask( void *pvParameters )
