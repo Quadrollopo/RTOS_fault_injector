@@ -49,5 +49,37 @@ Idee: <br>
 
 * usare pià strutture di sistema possibile (mutex, timer, code, semafori ecc.)
 
+### Progressi attuali
+
+
 #### Dubbi
 come monitorare i ritardi (errore 3)?
+
+# Link utili
+* timers:
+  * https://www.freertos.org/RTOS-software-timer.html
+  * https://www.freertos.org/FreeRTOS-Software-Timer-API-Functions.html (API)
+* semafori:
+  * https://www.freertos.org/Embedded-RTOS-Binary-Semaphores.html
+  * https://www.freertos.org/a00113.html (API)
+* Queue:
+  * https://www.freertos.org/Embedded-RTOS-Queues.html
+  * https://www.freertos.org/a00018.html (API)
+* MessageBuffer:
+  * https://www.freertos.org/RTOS-message-buffer-example.html
+  * https://www.freertos.org/RTOS-message-buffer-API.html (API)
+* StreamBuffer:
+  * https://www.freertos.org/RTOS-stream-buffer-example.html
+  * https://www.freertos.org/RTOS-stream-buffer-API.html (API)
+* Task:
+  * https://www.freertos.org/a00015.html
+  * https://www.freertos.org/a00019.html (API - task create/delete)
+  * https://www.freertos.org/a00112.html (API - task control)
+  * https://www.freertos.org/a00021.html (API - task utilities)
+
+# Referenze
+
+* https://www.freertos.org/FreeRTOS-simulator-for-Linux.html
+* https://www.freertos.org/FreeRTOS-Windows-Simulator-Emulator-for-Visual-Studio-and-Eclipse-MingW.html
+* https://github.com/megakilo/FreeRTOS-Sim
+* https://github.com/alxhoff/FreeRTOS-Emulator
