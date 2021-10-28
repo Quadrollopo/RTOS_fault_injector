@@ -63,10 +63,11 @@
 /* Local includes. */
 #include "console.h"
 
-#define    BLINKY_DEMO       1
+#define    BLINKY_DEMO       0
 #define    FULL_DEMO         0
+#define    ANDRE_DEMO        1
 
-#define mainSELECTED_APPLICATION BLINKY_DEMO
+#define mainSELECTED_APPLICATION ANDRE_DEMO
 
 /* This demo uses heap_3.c (the libc provided malloc() and free()). */
 
@@ -150,6 +151,11 @@ int main( void )
     {
         console_print("Starting full demo\n");
         main_full();
+    }
+    #elif ( mainSELECTED_APPLICATION == ANDRE_DEMO)
+    {
+        console_print("Starting andre demo\n");
+        main_andre();
     }
     #else
     {

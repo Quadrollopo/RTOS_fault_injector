@@ -99,10 +99,10 @@
 /* The rate at which data is sent to the queue.  The times are converted from
  * milliseconds to ticks using the pdMS_TO_TICKS() macro. */
 #define mainTASK_SEND_FREQUENCY_MS         pdMS_TO_TICKS( 200UL )
-#define mainTIMER_SEND_FREQUENCY_MS        pdMS_TO_TICKS( 2000UL )
+#define mainTIMER_SEND_FREQUENCY_MS        pdMS_TO_TICKS( 4000UL )
 
 /* The number of items the queue can hold at once. */
-#define mainQUEUE_LENGTH                   ( 2 )
+#define mainQUEUE_LENGTH                   ( 4 )
 
 /* The values sent to the queue receive task from the queue send task and the
  * queue send software timer respectively. */
@@ -116,11 +116,11 @@
  */
 static void prvQueueReceiveTask( void * pvParameters );
 static void prvQueueSendTask( void * pvParameters );
-
+//static void timerCheck( void * pvParameters );
 /*
  * The callback function executed when the software timer expires.
  */
-static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle );
+static void shutdownTimer( TimerHandle_t xTimerHandle );
 
 /*-----------------------------------------------------------*/
 
@@ -136,7 +136,7 @@ static SemaphoreHandle_t xSemaphore = NULL;
 /*-----------------------------------------------------------*/
 
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
-void main_blinky( void )
+void main_andre( void )
 {
     const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
@@ -155,13 +155,14 @@ void main_blinky( void )
                      NULL );                          /* The task handle is not required, so NULL is passed. */
 
         xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+        //xTaskCreate( timerCheck, "TCheck", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
         /* Create the software timer, but don't start it yet. */
         xTimer = xTimerCreate( "Timer",                     /* The text name assigned to the software timer - for debug only as it is not used by the kernel. */
                                xTimerPeriod,                /* The period of the software timer in ticks. */
-                               pdTRUE,                      /* xAutoReload is set to pdTRUE. */
+                               0,                      /* xAutoReload is set to pdFalse. */
                                NULL,                        /* The timer's ID is not used. */
-                               prvQueueSendTimerCallback ); /* The function executed when the timer expires. */
+                               shutdownTimer ); /* The function executed when the timer expires. */
 
         if( xTimer != NULL )
         {
@@ -212,10 +213,9 @@ static void prvQueueSendTask( void * pvParameters )
 }
 /*-----------------------------------------------------------*/
 
-static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle )
+static void shutdownTimer( TimerHandle_t xTimerHandle )
 {
-    const uint32_t ulValueToSend = mainVALUE_SENT_FROM_TIMER;
-
+  //shut everything down
     /* This is the software timer callback function.  The software timer has a
      * period of two seconds and is reset each time a key is pressed.  This
      * callback function will execute if the timer expires, which will only happen
@@ -223,11 +223,10 @@ static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle )
 
     /* Avoid compiler warnings resulting from the unused parameter. */
     ( void ) xTimerHandle;
+    console_print("Timer has been hit, shutting down freeRTOS\n");
 
-    /* Send to the queue - causing the queue receive task to unblock and
-     * write out a message.  This function is called from the timer/daemon task, so
-     * must not block.  Hence the block time is set to 0. */
-    xQueueSend( xQueue, &ulValueToSend, 0U );
+    //vTaskEndScheduler();
+    exit(0);
 }
 /*-----------------------------------------------------------*/
 

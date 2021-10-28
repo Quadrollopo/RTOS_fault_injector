@@ -11,7 +11,7 @@ if(UNIX)
 	set(FREERTOS_PLUS_DIR_REL "../../FreeRTOS-Plus")
 	get_filename_component(FREERTOS_PLUS_DIR ${FREERTOS_PLUS_DIR_REL} ABSOLUTE  )
 
-	add_executable(freeRTOS "Posix_GCC/main.c" "Posix_GCC/main_blinky.c" "Posix_GCC/code_coverage_additions.c" "Posix_GCC/console.c"
+	add_executable(freeRTOS "Posix_GCC/main.c" "Posix_GCC/main_andre.c" "Posix_GCC/main_blinky.c" "Posix_GCC/code_coverage_additions.c" "Posix_GCC/console.c"
 			"Posix_GCC/main_full.c" "Posix_GCC/run-time-stats-utils.c" "Posix_GCC/trcConfig.h" "Posix_GCC/trcSnapshotConfig.h")
 
 	target_include_directories(freeRTOS PUBLIC "${FREERTOS_DIR}/Source/include"
@@ -57,13 +57,13 @@ if(UNIX)
 			${FREERTOS_PLUS_DIR}/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c
 			${FREERTOS_PLUS_DIR}/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c
 			${FREERTOS_PLUS_DIR}/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c
-	)	
+	)
 endif(UNIX)
 
 if(WIN32)
 	cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 	set(CMAKE_FILES_DIRECTORY    "WIN32")
-	
+
 project(WIN32 C)
 
 ################################################################################
@@ -373,4 +373,3 @@ endif()
 
 
 endif(WIN32)
-			
