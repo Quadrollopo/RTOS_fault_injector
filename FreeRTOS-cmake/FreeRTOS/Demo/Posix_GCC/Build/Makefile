@@ -898,6 +898,33 @@ Posix_GCC/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/freeRTOS.dir/build.make CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.s
 .PHONY : Posix_GCC/main.c.s
 
+Posix_GCC/main_andre.o: Posix_GCC/main_andre.c.o
+
+.PHONY : Posix_GCC/main_andre.o
+
+# target to build an object file
+Posix_GCC/main_andre.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/freeRTOS.dir/build.make CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o
+.PHONY : Posix_GCC/main_andre.c.o
+
+Posix_GCC/main_andre.i: Posix_GCC/main_andre.c.i
+
+.PHONY : Posix_GCC/main_andre.i
+
+# target to preprocess a source file
+Posix_GCC/main_andre.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/freeRTOS.dir/build.make CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.i
+.PHONY : Posix_GCC/main_andre.c.i
+
+Posix_GCC/main_andre.s: Posix_GCC/main_andre.c.s
+
+.PHONY : Posix_GCC/main_andre.s
+
+# target to generate assembly for a file
+Posix_GCC/main_andre.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/freeRTOS.dir/build.make CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.s
+.PHONY : Posix_GCC/main_andre.c.s
+
 Posix_GCC/main_blinky.o: Posix_GCC/main_blinky.c.o
 
 .PHONY : Posix_GCC/main_blinky.o
@@ -1450,6 +1477,9 @@ help:
 	@echo "... Posix_GCC/main.o"
 	@echo "... Posix_GCC/main.i"
 	@echo "... Posix_GCC/main.s"
+	@echo "... Posix_GCC/main_andre.o"
+	@echo "... Posix_GCC/main_andre.i"
+	@echo "... Posix_GCC/main_andre.s"
 	@echo "... Posix_GCC/main_blinky.o"
 	@echo "... Posix_GCC/main_blinky.i"
 	@echo "... Posix_GCC/main_blinky.s"

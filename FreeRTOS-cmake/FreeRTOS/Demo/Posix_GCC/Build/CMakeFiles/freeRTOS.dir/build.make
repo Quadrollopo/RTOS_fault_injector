@@ -89,9 +89,22 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main.c -o CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.s
 
+CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o: CMakeFiles/freeRTOS.dir/flags.make
+CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o: ../main_andre.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_andre.c
+
+CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_andre.c > CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.i
+
+CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_andre.c -o CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.s
+
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o: ../main_blinky.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_blinky.c
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.i: cmake_force
@@ -104,7 +117,7 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o: ../code_coverage_additions.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/code_coverage_additions.c
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.i: cmake_force
@@ -117,7 +130,7 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o: ../console.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/console.c
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.i: cmake_force
@@ -130,7 +143,7 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o: ../main_full.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_full.c
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.i: cmake_force
@@ -143,7 +156,7 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o: ../run-time-stats-utils.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/run-time-stats-utils.c
 
 CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.i: cmake_force
@@ -156,7 +169,7 @@ CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/croutine.c.i: cmake_force
@@ -169,7 +182,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/event_groups.c.i: cmake_force
@@ -182,7 +195,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/list.c.i: cmake_force
@@ -195,7 +208,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/queue.c.i: cmake_force
@@ -208,7 +221,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/stream_buffer.c.i: cmake_force
@@ -221,7 +234,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/tasks.c.i: cmake_force
@@ -234,7 +247,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/timers.c.i: cmake_force
@@ -247,7 +260,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/MemMang/heap_3.c.i: cmake_force
@@ -260,7 +273,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/utils/wait_for_event.c.i: cmake_force
@@ -273,7 +286,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Source/portable/ThirdParty/GCC/Posix/port.c.i: cmake_force
@@ -286,7 +299,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.o: ../../Common/Minimal/AbortDelay.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/AbortDelay.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.i: cmake_force
@@ -299,7 +312,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/AbortDelay.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.o: ../../Common/Minimal/BlockQ.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/BlockQ.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.i: cmake_force
@@ -312,7 +325,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/BlockQ.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.o: ../../Common/Minimal/blocktim.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/blocktim.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.i: cmake_force
@@ -325,7 +338,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/blocktim.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.o: ../../Common/Minimal/countsem.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/countsem.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.i: cmake_force
@@ -338,7 +351,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/countsem.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.o: ../../Common/Minimal/death.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/death.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.i: cmake_force
@@ -351,7 +364,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/death.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.o: ../../Common/Minimal/dynamic.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/dynamic.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.i: cmake_force
@@ -364,7 +377,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/dynamic.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.o: ../../Common/Minimal/EventGroupsDemo.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/EventGroupsDemo.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.i: cmake_force
@@ -377,7 +390,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/EventGroupsDemo.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.o: ../../Common/Minimal/flop.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/flop.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.i: cmake_force
@@ -390,7 +403,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/flop.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.o: ../../Common/Minimal/GenQTest.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/GenQTest.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.i: cmake_force
@@ -403,7 +416,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/GenQTest.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.o: ../../Common/Minimal/integer.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/integer.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.i: cmake_force
@@ -416,7 +429,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/integer.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.o: ../../Common/Minimal/IntSemTest.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/IntSemTest.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.i: cmake_force
@@ -429,7 +442,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/IntSemTest.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.o: ../../Common/Minimal/MessageBufferAMP.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/MessageBufferAMP.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.i: cmake_force
@@ -442,7 +455,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferAMP.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.o: ../../Common/Minimal/MessageBufferDemo.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/MessageBufferDemo.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.i: cmake_force
@@ -455,7 +468,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/MessageBufferDemo.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.o: ../../Common/Minimal/PollQ.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/PollQ.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.i: cmake_force
@@ -468,7 +481,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/PollQ.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.o: ../../Common/Minimal/QPeek.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/QPeek.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.i: cmake_force
@@ -481,7 +494,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/QPeek.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.o: ../../Common/Minimal/QueueOverwrite.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/QueueOverwrite.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.i: cmake_force
@@ -494,7 +507,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/QueueOverwrite.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.o: ../../Common/Minimal/QueueSet.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/QueueSet.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.i: cmake_force
@@ -507,7 +520,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSet.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.o: ../../Common/Minimal/QueueSetPolling.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/QueueSetPolling.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.i: cmake_force
@@ -520,7 +533,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/QueueSetPolling.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.o: ../../Common/Minimal/recmutex.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/recmutex.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.i: cmake_force
@@ -533,7 +546,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/recmutex.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.o: ../../Common/Minimal/semtest.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/semtest.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.i: cmake_force
@@ -546,7 +559,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/semtest.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.o: ../../Common/Minimal/StaticAllocation.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/StaticAllocation.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.i: cmake_force
@@ -559,7 +572,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/StaticAllocation.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.o: ../../Common/Minimal/StreamBufferDemo.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/StreamBufferDemo.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.i: cmake_force
@@ -572,7 +585,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferDemo.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.o: ../../Common/Minimal/StreamBufferInterrupt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/StreamBufferInterrupt.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.i: cmake_force
@@ -585,7 +598,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/StreamBufferInterrupt.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.o: ../../Common/Minimal/TaskNotify.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/TaskNotify.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.i: cmake_force
@@ -598,7 +611,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/TaskNotify.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.o: ../../Common/Minimal/TimerDemo.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building C object CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Common/Minimal/TimerDemo.c
 
 CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.i: cmake_force
@@ -611,7 +624,7 @@ CMakeFiles/freeRTOS.dir/Common/Minimal/TimerDemo.c.s: cmake_force
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcKernelPort.c.i: cmake_force
@@ -624,7 +637,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcSnapshotRecorder.c.i: cmake_force
@@ -637,7 +650,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/trcStreamingRecorder.c.i: cmake_force
@@ -650,7 +663,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o: CMakeFiles/freeRTOS.dir/flags.make
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o: /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o -c /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c
 
 CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.i: cmake_force
@@ -664,6 +677,7 @@ CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/Fr
 # Object files for target freeRTOS
 freeRTOS_OBJECTS = \
 "CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.o" \
+"CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o" \
 "CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o" \
 "CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o" \
 "CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o" \
@@ -713,6 +727,7 @@ freeRTOS_OBJECTS = \
 freeRTOS_EXTERNAL_OBJECTS =
 
 freeRTOS: CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.o
+freeRTOS: CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o
 freeRTOS: CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o
 freeRTOS: CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o
 freeRTOS: CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o
@@ -759,7 +774,7 @@ freeRTOS: CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_i
 freeRTOS: CMakeFiles/freeRTOS.dir/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/streamports/File/trcStreamingPort.c.o
 freeRTOS: CMakeFiles/freeRTOS.dir/build.make
 freeRTOS: CMakeFiles/freeRTOS.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Linking C executable freeRTOS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Linking C executable freeRTOS"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/freeRTOS.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

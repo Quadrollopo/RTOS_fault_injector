@@ -64,10 +64,10 @@
 #include "console.h"
 
 #define    BLINKY_DEMO       0
-#define    FULL_DEMO         0
-#define    ANDRE_DEMO        1
+#define    FULL_DEMO         1
+#define    ANDRE_DEMO        2
 
-#define mainSELECTED_APPLICATION ANDRE_DEMO
+#define mainSELECTED_APPLICATION BLINKY_DEMO
 
 /* This demo uses heap_3.c (the libc provided malloc() and free()). */
 

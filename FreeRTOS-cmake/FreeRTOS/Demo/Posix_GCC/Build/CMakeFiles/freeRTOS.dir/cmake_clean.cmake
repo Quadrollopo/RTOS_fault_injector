@@ -27,6 +27,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/freeRTOS.dir/Posix_GCC/code_coverage_additions.c.o"
   "CMakeFiles/freeRTOS.dir/Posix_GCC/console.c.o"
   "CMakeFiles/freeRTOS.dir/Posix_GCC/main.c.o"
+  "CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o"
   "CMakeFiles/freeRTOS.dir/Posix_GCC/main_blinky.c.o"
   "CMakeFiles/freeRTOS.dir/Posix_GCC/main_full.c.o"
   "CMakeFiles/freeRTOS.dir/Posix_GCC/run-time-stats-utils.c.o"

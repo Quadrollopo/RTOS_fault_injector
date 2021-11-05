@@ -83,6 +83,8 @@ stdio.h
 -
 pthread.h
 -
+string.h
+-
 FreeRTOS.h
 /home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/FreeRTOS.h
 task.h
