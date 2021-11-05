@@ -2,3 +2,8 @@
 /cmake-build-debug/
 
 /.idea/
+/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/Falso_Dante.txt
+/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/Vero_Dante.txt
+/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles/freeRTOS.dir/Posix_GCC/main_andre.c.o
+/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/rtos_pid.txt
+/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/Trace.dump
