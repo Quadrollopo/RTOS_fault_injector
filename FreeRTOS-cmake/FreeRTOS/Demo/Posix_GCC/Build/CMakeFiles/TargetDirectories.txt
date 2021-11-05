@@ -1,3 +1,0 @@
-/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles/rebuild_cache.dir
-/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles/edit_cache.dir
-/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/CMakeFiles/freeRTOS.dir
