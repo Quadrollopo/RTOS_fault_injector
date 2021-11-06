@@ -7,6 +7,7 @@
 #include <chrono>
 #include <unistd.h>
 #include <sys/wait.h>
+#include "FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_blinky.c"
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -40,7 +41,9 @@ int injector(pid_t pid, long startAddr, long endAddr) {
     return 0;
 }
 
-void rtos(){}
+void rtos(){
+    main_blinky();
+}
 
 
 int main(int argc, char** argv){
@@ -60,7 +63,7 @@ int main(int argc, char** argv){
     }
     long startAddr, endAddr;
 
-    //TODO: Select a random range of addres to inject
+    //TODO: Select a random range of address to inject
 
 
     pid_injector = fork();
