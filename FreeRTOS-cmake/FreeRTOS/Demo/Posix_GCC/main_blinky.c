@@ -150,8 +150,8 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
     if( xQueue != NULL )
 	{
-        fR = fopen("Vero_Dante.txt", "r");
-        fW = fopen("Falso_Dante.txt", "w");
+        fR = fopen("../Vero_Dante.txt", "r");
+        fW = fopen("../Falso_Dante.txt", "w");
         if(fR==NULL || fW==NULL) {
             vQueueDelete(xQueue);
             if(fR != NULL)
