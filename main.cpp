@@ -7,7 +7,6 @@
 #include <chrono>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/main_blinky.c"
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -42,7 +41,8 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 }
 
 void rtos(){
-    main_blinky();
+    char* arg_list[] = { "./FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS" };
+    execv(arg_list[0], arg_list);
 }
 
 
@@ -52,11 +52,12 @@ int main(int argc, char** argv){
     if(pid_golden == 0) {
         rtos(); //golden
         return 0;
+    }else {
+        int status;
+        waitpid(pid_golden, &status, 0);
+        printf("Attesa");
     }
-    int status;
-    waitpid(pid_golden, &status, 0);
-
-    pid_rtos = fork();
+    /*pid_rtos = fork();
     if(pid_rtos == 0){
         rtos();
         return 0;
@@ -70,7 +71,7 @@ int main(int argc, char** argv){
     if(pid_injector == 0){
         injector(pid_rtos, startAddr, endAddr);
         return 0;
-    }
+    }*/
 
     //TODO: Check the output with the golden
 }
