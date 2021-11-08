@@ -41,8 +41,8 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 }
 
 void rtos(){
-    char* arg_list[] = { "./FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS" };
-    execv(arg_list[0], arg_list);
+    execl("/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
+          "/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
 }
 
 
@@ -55,7 +55,6 @@ int main(int argc, char** argv){
     }else {
         int status;
         waitpid(pid_golden, &status, 0);
-        printf("Attesa");
     }
     /*pid_rtos = fork();
     if(pid_rtos == 0){

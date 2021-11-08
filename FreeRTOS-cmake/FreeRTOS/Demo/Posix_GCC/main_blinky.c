@@ -100,7 +100,7 @@
 /* The rate at which data is sent to the queue.  The times are converted from
 milliseconds to ticks using the pdMS_TO_TICKS() macro. */
 #define mainTASK_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 1000UL )
-#define mainTIMER_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 11000UL )
+#define mainTIMER_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 4000UL )
 
 /* The number of items the queue can hold at once. */
 #define mainQUEUE_LENGTH					( 2 )
@@ -154,6 +154,7 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
         fW = fopen("../Falso_Dante.txt", "w");
         if(fR==NULL || fW==NULL) {
             vQueueDelete(xQueue);
+            printf("Non ho trovato i file\n");
             if(fR != NULL)
                 fclose(fR);
         }
