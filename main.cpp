@@ -41,8 +41,9 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 }
 
 void rtos(){
-    execl("/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
-          "/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
+    cout << "Child running rtos" << endl;
+    execl("/home/andrea/Desktop/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
+          "/home/andrea/Desktop/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
 }
 
 
@@ -74,5 +75,3 @@ int main(int argc, char** argv){
 
     //TODO: Check the output with the golden
 }
-
-
