@@ -57,6 +57,14 @@ int main(int argc, char** argv){
         int status;
         waitpid(pid_golden, &status, 0);
     }
+    pid_golden = fork();
+    if(pid_golden == 0) {
+        execl("/bin/mv", "/bin/mv", "../Falso_Dante.txt", "../Golden_execution.txt", (char *)0);
+        return 0;
+    }else {
+        int status;
+        waitpid(pid_golden, &status, 0);
+    }
     /*pid_rtos = fork();
     if(pid_rtos == 0){
         rtos();
