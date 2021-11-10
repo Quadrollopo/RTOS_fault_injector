@@ -7,6 +7,7 @@
 #include <chrono>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <cstdlib>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -42,13 +43,14 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 
 void rtos(){
     cout << "Child running rtos" << endl;
-    execl("/home/andrea/Desktop/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
-          "/home/andrea/Desktop/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
+    execl("/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
+          "/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
 }
 
 
 int main(int argc, char** argv){
     pid_t pid_golden, pid_injector, pid_rtos;
+    int status, status2;
     pid_golden = fork();
     if(pid_golden == 0) {
         rtos(); //golden
@@ -62,24 +64,26 @@ int main(int argc, char** argv){
         execl("/bin/mv", "/bin/mv", "../Falso_Dante.txt", "../Golden_execution.txt", (char *)0);
         return 0;
     }else {
-        int status;
+
         waitpid(pid_golden, &status, 0);
     }
-    /*pid_rtos = fork();
+    pid_rtos = fork();
     if(pid_rtos == 0){
         rtos();
         return 0;
     }
-    long startAddr, endAddr;
+    long startAddr = 0x431000, endAddr = 0x432000;
 
     //TODO: Select a random range of address to inject
 
 
     pid_injector = fork();
     if(pid_injector == 0){
+        usleep((rand() % 8000000));
         injector(pid_rtos, startAddr, endAddr);
         return 0;
-    }*/
-
+    }
+    waitpid(pid_rtos, &status, 0);
+    waitpid(pid_injector, &status2, 0);
     //TODO: Check the output with the golden
 }
