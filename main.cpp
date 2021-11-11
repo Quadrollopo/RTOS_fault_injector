@@ -42,9 +42,8 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 }
 
 void rtos(){
-    cout << "Child running rtos" << endl;
-    execl("/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS",
-          "/home/marco/Scrivania/Progetto_PDS/RTOS_fault_injector/FreeRTOS-cmake/FreeRTOS/Demo/build/freeRTOS");
+    execl("../build/freeRTOS",
+          "../build/freeRTOS");
 }
 
 
@@ -53,23 +52,26 @@ int main(int argc, char** argv){
     int status, status2;
     pid_golden = fork();
     if(pid_golden == 0) {
-        rtos(); //golden
+		//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS COUT
+		this_thread::sleep_for(chrono::seconds(1));
+
+		rtos(); //golden
         return 0;
-    }else {
-        int status;
-        waitpid(pid_golden, &status, 0);
     }
+	waitpid(pid_golden, &status, 0);
+
     pid_golden = fork();
     if(pid_golden == 0) {
-        execl("/bin/mv", "/bin/mv", "../Falso_Dante.txt", "../Golden_execution.txt", (char *)0);
+        execl("/bin/mv", "/bin/mv", "../Falso_Dante.txt", "../Golden_execution.txt", (char *)nullptr);
         return 0;
-    }else {
-
-        waitpid(pid_golden, &status, 0);
     }
+
+	waitpid(pid_golden, &status, 0);
+
     pid_rtos = fork();
     if(pid_rtos == 0){
-        rtos();
+		this_thread::sleep_for(chrono::seconds(1));
+		rtos();
         return 0;
     }
     long startAddr = 0x431000, endAddr = 0x432000;
@@ -79,11 +81,28 @@ int main(int argc, char** argv){
 
     pid_injector = fork();
     if(pid_injector == 0){
-        usleep((rand() % 8000000));
         injector(pid_rtos, startAddr, endAddr);
         return 0;
     }
     waitpid(pid_rtos, &status, 0);
     waitpid(pid_injector, &status2, 0);
-    //TODO: Check the output with the golden
+
+	ifstream golden_output("../Golden_execution.txt");
+	ifstream rtos_output("../Falso_Dante.txt");
+	if(!golden_output.is_open()){
+		cout << "Can't open the golden execution output" << endl;
+		return -1;
+	}
+	if(!rtos_output.is_open()){
+		cout << "Can't open the rtos execution output" << endl;
+		return -1;
+	}
+	for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line); ){
+		if (g_line != f_line){
+			cout << "The output should be" << endl << g_line << endl
+			<< "instead I found" << endl << f_line << endl;
+		}
+	}
+	rtos_output.close();
+	golden_output.close();
 }
