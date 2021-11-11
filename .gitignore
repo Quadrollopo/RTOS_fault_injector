@@ -3,3 +3,5 @@
 
 /.idea/
 /FreeRTOS-cmake/FreeRTOS/Demo/Posix_GCC/Build/
+/build/
+Vero_Dante.txt
