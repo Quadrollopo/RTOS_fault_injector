@@ -22,6 +22,10 @@ Aggiungere indirizzi di var globali e strutture varie qui <br>
 | 0x432000-0x460000 | heap |
 |0x7ffffffde000-0x7ffffffff000 | stack |
 |0x431000-0x432000 | variabili globali |
+|0x433ba0 - | fR (file pointer a Vero_Dante) |
+|0x433ba8 | fW (file pointer a Falso_Dante) |
+|0x4316e8 | xQueue |
+|0x4316f0 | xTimer |
 
 # Tipologie di errori
 1. Nessun errore (o Masked) per cui l’output del sistema non subisce alcuna alterazione
