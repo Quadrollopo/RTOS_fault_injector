@@ -98,36 +98,36 @@ int main(int argc, char** argv){
     int iter = 0;
     while(iter<8) {
         cout << endl << "Itering injections, iteration : " << iter << endl;
-    pid_rtos = fork();
-    if(pid_rtos == 0){
-        cout << "freeRTOS iter : " << iter << endl;
-		//this_thread::sleep_for(chrono::seconds(1));
-		rtos();
-        return 0;
+        pid_rtos = fork();
+        if(pid_rtos == 0){
+            cout << "freeRTOS iter : " << iter << endl;
+            //this_thread::sleep_for(chrono::seconds(1));
+            rtos();
+            return 0;
+        }
+
+            long startAddr = 0x431000, endAddr = 0x432000;
+            long addresses[4] = {0x433ba0, 0x433ba8, 0x4316e8, 0x4316f0};
+
+            //TODO: Select a random range of address to inject
+
+        pid_injector = fork();
+        if(pid_injector == 0){
+            this_thread::sleep_for(chrono::milliseconds (rand()%9000));
+            //injector(pid_rtos, startAddr, endAddr);
+            injector(pid_rtos, addresses[chosen], addresses[chosen] + 8);
+            return 0;
+        }
+        waitpid(pid_rtos, &status, 0);
+        waitpid(pid_injector, &status2, 0);
+        /*
+        string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
+        cout << endl << "Now printing differences between generated files" << endl;
+        system(cmd.c_str());
+        cout << "print done" << endl; */
+        checkFiles();
+        iter++;
     }
-
-    long startAddr = 0x431000, endAddr = 0x432000;
-    long addresses[4] = {0x433ba0, 0x433ba8, 0x4316e8, 0x4316f0};
-
-    //TODO: Select a random range of address to inject
-
-    pid_injector = fork();
-    if(pid_injector == 0){
-        this_thread::sleep_for(chrono::milliseconds (rand()%9000));
-        //injector(pid_rtos, startAddr, endAddr);
-        injector(pid_rtos, addresses[chosen], addresses[chosen] + 8);
-        return 0;
-    }
-    waitpid(pid_rtos, &status, 0);
-    waitpid(pid_injector, &status2, 0);
-    /*
-    string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
-    cout << endl << "Now printing differences between generated files" << endl;
-    system(cmd.c_str());
-    cout << "print done" << endl; */
-    checkFiles();
-    iter++;
-}
 
 return 0;
 }
