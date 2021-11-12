@@ -50,8 +50,9 @@ void rtos(){
 }
 
 int checkFiles(){
-    ifstream golden_output("Golden_execution.txt");
-    ifstream rtos_output("Falso_Dante.txt");
+    ifstream golden_output("../Golden_execution.txt");
+    ifstream rtos_output("../Falso_Dante.txt");
+    bool found = false;
     if(!golden_output.is_open()){
         cout << "Can't open the golden execution output" << endl;
         return -1;
@@ -62,10 +63,13 @@ int checkFiles(){
     }
     for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line); ){
         if (g_line != f_line){
+            found = true;
             cout << "The output should be" << endl << g_line << endl
                  << "instead I found" << endl << f_line << endl;
         }
     }
+    if(!found)
+        cout << endl << "No differences has been found" << endl;
     rtos_output.close();
     golden_output.close();
     return 0;
@@ -89,13 +93,11 @@ int main(int argc, char** argv){
         return 0;
     }
 	waitpid(pid_golden, &status, 0);
+    system("mv ../Falso_Dante.txt ../Golden_execution.txt");
 
     int iter = 0;
     while(iter<8) {
         cout << endl << "Itering injections, iteration : " << iter << endl;
-
-        system("mv Falso_Dante.txt Golden_execution.txt");
-
     pid_rtos = fork();
     if(pid_rtos == 0){
         cout << "freeRTOS iter : " << iter << endl;
@@ -111,7 +113,7 @@ int main(int argc, char** argv){
 
     pid_injector = fork();
     if(pid_injector == 0){
-        this_thread::sleep_for(chrono::milliseconds(rand()%9000));
+        this_thread::sleep_for(chrono::milliseconds (rand()%9000));
         //injector(pid_rtos, startAddr, endAddr);
         injector(pid_rtos, addresses[chosen], addresses[chosen] + 8);
         return 0;
