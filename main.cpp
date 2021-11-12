@@ -44,14 +44,14 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 
 void rtos(){
     cout << endl << "Child running rtos" << endl;
-    execve("./freeRTOS", NULL, NULL);
+    execve("../build/freeRTOS", NULL, NULL);
     //execl("../build/freeRTOS",
       //    "../build/freeRTOS");
 }
 
 int checkFiles(){
-    ifstream golden_output("../Golden_execution.txt");
-    ifstream rtos_output("../Falso_Dante.txt");
+    ifstream golden_output("Golden_execution.txt");
+    ifstream rtos_output("Falso_Dante.txt");
     if(!golden_output.is_open()){
         cout << "Can't open the golden execution output" << endl;
         return -1;
@@ -94,7 +94,7 @@ int main(int argc, char** argv){
     while(iter<8) {
         cout << endl << "Itering injections, iteration : " << iter << endl;
 
-        system("mv ../Falso_Dante.txt ../Golden_execution.txt");
+        system("mv Falso_Dante.txt Golden_execution.txt");
 
     pid_rtos = fork();
     if(pid_rtos == 0){
@@ -111,7 +111,7 @@ int main(int argc, char** argv){
 
     pid_injector = fork();
     if(pid_injector == 0){
-        this_thread::sleep_for(chrono::seconds(rand()%3000));
+        this_thread::sleep_for(chrono::milliseconds(rand()%9000));
         //injector(pid_rtos, startAddr, endAddr);
         injector(pid_rtos, addresses[chosen], addresses[chosen] + 8);
         return 0;
