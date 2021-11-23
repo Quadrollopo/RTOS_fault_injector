@@ -16,6 +16,32 @@ using namespace std;
 
 int injector(pid_t pid, long startAddr, long endAddr) {
 	cout << "Child starting injector" << endl;
+	ifstream mapfile;
+	mapfile.open("/proc/" + to_string(pid) + "/maps");
+	if(!mapfile.is_open()){
+		cout << "Can't open file /proc/" + to_string(pid) + "/maps" << endl;
+		return 2;
+	}
+	string line;
+	int numAddrs = 0;
+	long address[20][2];
+	while (getline(mapfile, line) && mapfile.good() && line.find("heap") == string::npos);
+	while (getline(mapfile, line) && mapfile.good() && line.find('/') == string::npos){
+		string perms;
+		perms = line.substr(line.find(' '), 4);
+		if (perms.find('w') == string::npos || perms.find('r') == string::npos)
+			continue;
+		size_t separator = line.find('-');
+		address[numAddrs][0] = stol(line.substr(0, separator), nullptr, 16);
+		address[numAddrs][1] = stol(line.substr(separator + 1, separator), nullptr, 16);
+		numAddrs++;
+	}
+	mapfile.close();
+	if(numAddrs == 0){
+		cout << "no address found" << endl;
+		return 1;
+	}
+
 	fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
 	if (!memFile.is_open()) {
 		cout << "Can't open file /proc/" + to_string(pid) + "/mem" << endl;
@@ -23,13 +49,21 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 	}
 	random_device generator;
 	uniform_int_distribution<int> bit_distribution(0, 7);
-	for (int i = 0; i < 50; ++i) {
+	uniform_int_distribution<int> range_addrs(0, numAddrs-1);
+	for (int i = 0; i < 100; ++i) {
 		uint8_t byte, mask = bit_distribution(generator);
-		uniform_int_distribution<long> address_distribution(startAddr, endAddr);
-
+		int index = range_addrs(generator);
+		uniform_int_distribution<long> address_distribution(address[index][0], address[index][1]);
 		long addr = address_distribution(generator);
 		memFile.seekg(addr);
 		byte = memFile.peek();
+		for(int timer = 0; timer < 1000 && byte == 0; timer++){
+			index = range_addrs(generator);
+			uniform_int_distribution<long> address_distribution(address[index][0], address[index][1]);
+			addr = address_distribution(generator);
+			memFile.seekg(addr);
+			byte = memFile.peek();
+		}
 
 		//Flipbit
 		byte ^= 1 << mask;
