@@ -9,8 +9,9 @@ make
 
 # Robe da fare
  - [x] CMAKE
- - [ ] codare versione definitiva freeRTOS
- - [ ] injector
+ - [x] codare versione definitiva freeRTOS
+ - [x] injector
+ - [ ] logger
  - [ ] parallelizzare
 
 # Indirizzi utili

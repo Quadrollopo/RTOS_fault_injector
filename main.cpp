@@ -9,8 +9,6 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <limits>
-#include <csignal>
-#include <chrono>
 #include "Logger.hpp"
 #include <tuple>
 
@@ -135,8 +133,8 @@ long getFileLen(ifstream &file) {
     return (long) length;
 }
 
-int checkFiles(int pid_golden, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
-	ifstream golden_output("../files/Golden_execution" + to_string(pid_golden) + ".txt");
+int checkFiles(int pid_rtos) {
+	ifstream golden_output("../files/Golden_execution.txt");
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
     long s1, s2;
@@ -153,25 +151,18 @@ int checkFiles(int pid_golden, int pid_rtos, long addr, chrono::duration<long, s
     s1 = getFileLen(golden_output);
     s2 = getFileLen(rtos_output);
 
-    if(s1!=s2) { // Crash
+	for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
+		if (g_line != f_line) {
+			found = true;
+			cout << "The output should be" << endl << g_line << endl
+				 << "instead I found" << endl << f_line << endl;
+		}
+	}
+	if (!found)
+		cout << endl << "No differences have been found" << endl;
+    if(s1!=s2)
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-        logger.addInjection(addr, elapsed, "Crash");
-    }
-    else {
-        for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
-            if (g_line != f_line) {
-                found = true;
-                cout << "The output should be" << endl << g_line << endl
-                     << "instead I found" << endl << f_line << endl;
-            }
-        }
-        if (!found) { //Masked
-            cout << endl << "No differences have been found" << endl;
-            logger.addInjection(addr, elapsed, "Masked");
-        }
-        else
-            logger.addInjection(addr, elapsed, "SDC");
-    }
+
 	rtos_output.close();
 	golden_output.close();
 	return 0;
@@ -182,29 +173,53 @@ int main(int argc, char **argv) {
 	pid_t pid_golden, pid_injector, pid_rtos;
     int status, status2;
 	int chosen;
+	chrono::duration<long, ratio<1, 1000>> gtime{};
 	if (argc < 2)
 		chosen = 1;
 	else
 		chosen = (int) strtol(argv[1], nullptr, 10);
 
-    std::chrono::steady_clock::time_point bgold = std::chrono::steady_clock::now();
-    pid_golden = fork();
-	if (pid_golden == 0) {
-		//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
-		this_thread::sleep_for(chrono::seconds(1));
-		rtos(); //golden
-		return 0;
+	//If already exist a golden execution, dont start another one
+	ifstream gold("../files/Golden_execution.txt");
+	if(!gold) {
+		chrono::steady_clock::time_point bgold = chrono::steady_clock::now();
+		pid_golden = fork();
+		if (pid_golden == 0) {
+			//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
+			this_thread::sleep_for(chrono::seconds(1));
+
+			rtos(); //golden
+			return 0;
+		}
+		waitpid(pid_golden, &status, 0);
+		//Golden time
+
+		gtime = chrono::duration_cast<chrono::milliseconds>(
+				chrono::steady_clock::now() - bgold);
+		cout << endl << "Golden time : " << gtime.count() << endl;
+		ofstream time_golden("../files/Time_golden.txt");
+		if (time_golden)
+			time_golden << gtime.count();
+		else
+			cout << "Can't create Time_golden.txt";
+		time_golden.close();
+		cnt = 0;
+		const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution.txt";
+		system((const char *) cmd.c_str());
+	}else{
+		cout << "Found another golden execution output, skipping execution..." << endl;
+		ifstream time_golden("../files/Time_golden.txt");
+		if (time_golden){
+			long time;
+			time_golden >> time;
+			gtime = chrono::milliseconds(time);
+			time_golden.close();
+			cout << gtime.count();
+		}
+		else
+			cout << "Can't open Time_golden.txt";
 	}
-	waitpid(pid_golden, &status, 0);
-    //Golden time
-    std::chrono::steady_clock::time_point egold = std::chrono::steady_clock::now();
-    chrono::duration<long, std::ratio<1, 1000>> gtime = chrono::duration_cast<std::chrono::milliseconds>(egold - bgold);
-    cout << endl << "Golden time : " << gtime.count() << endl;
-
-    cnt = 0;
-    const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution" + to_string(pid_golden) + ".txt";
-    system((const char *) cmd.c_str());
-
+	gold.close();
 	int iter = 0;
 	while (iter < 8) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
@@ -273,7 +288,7 @@ int main(int argc, char **argv) {
 		cout << endl << "Now printing differences between generated files" << endl;
 		system(cmd.c_str());
 		cout << "print done" << endl;*/
-		checkFiles(pid_golden, pid_rtos, inj_addr, elapsed);
+		checkFiles(pid_rtos);
 		iter++;
 	}
 
