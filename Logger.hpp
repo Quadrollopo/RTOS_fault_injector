@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <list>
+#include <utility>
 
 using namespace std;
 
@@ -11,8 +12,8 @@ using namespace std;
 
 class Injection{
 public:
-    Injection(long address, const chrono::duration<long, std::ratio<1, 1000>> &elapsed, const string &faultType
-              ) : address(address), elapsed(elapsed), faultType(faultType) {}
+    Injection(long address, const chrono::duration<long, std::ratio<1, 1000>> &elapsed, string faultType
+              ) : address(address), elapsed(elapsed), faultType(std::move(faultType)) {}
 
     Injection(Injection *pInjection) {
 
@@ -43,7 +44,7 @@ public:
     }
     void printInj(){
         for(Injection i : inj){
-            string s_inj = "Address : " + to_string(i.address) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
+            string s_inj = "Address : 0x" << hex << i.address << " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
             cout << s_inj;
         }
     }

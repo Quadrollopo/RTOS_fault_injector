@@ -86,7 +86,8 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 	memFile.close();
 	return 0;
 }*/
-long injector(pid_t pid, long startAddr, long endAddr) {
+int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
+    this_thread::sleep_for(chrono::milliseconds(rand() % 7000));
     cout << "Child starting injector" << endl;
     fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
     if (!memFile.is_open()) {
@@ -111,7 +112,8 @@ long injector(pid_t pid, long startAddr, long endAddr) {
          bitset<8>(byte).to_string().insert(8 - mask, COLOR_RESET).insert(7 - mask, COLOR_RED)
          << " at 0x" << hex << addr << endl;
     memFile.close();
-    return addr;
+    *chosenAddr = addr;
+    return 0;
 }
 
 void rtos() {
@@ -219,41 +221,34 @@ int main(int argc, char **argv) {
 		//long addresses[6] = {0x433ba0, 0x433ba8, 0x4316e8, 0x4316f0, 0x431700, 0x4311f8};
         string variables[7] = {"xNextTaskUnblockTime", "xIdleTaskHandle", "xTickCount", "xSchedulerRunning", "xYieldPending", "uxTaskNumber", "xIdleTaskHandle"};
         long addrOS[7] = {0x431a28, 0x431a30, 0x4319f0, 0x431a00, 0x431a10, 0x431a20, 0x431a30};
-        long addr = 0x316e8;
+        long addr1, addr2;
 
         //TODO: Select a random range of address to inject
-        long *inj_addr;
-        chrono::steady_clock::time_point inj = chrono::steady_clock::now();
 
-        pid_injector = fork();
-
-		if (pid_injector == 0) {
-            //ptrace(PTRACE_SEIZE, pid_rtos, NULL, NULL);
-            this_thread::sleep_for(chrono::milliseconds(rand() % 7000));
-			//injector(pid_rtos, startAddr - 0x400000, endAddr - 0x400000);
-            switch(chosen){
-                case 0: {
-                    thread injection1(injector, pid_rtos, 0x431320, 0x431320 + 176); //TCB1 --> crash or hang or nothing
-                    break;
-                }
-                case 1: {
-                    thread injection2(injector, pid_rtos, 0x431620, 0x431620 + 176); //TCB2 --> crash or hang or nothing
-                    break;
-                }
-                case 2:
-                    injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3 --> crash or hang or nothing
-                    break;
-                case 3:
-                    injector(pid_rtos, 0x431760, 0x431760 + 16);
-                    break;
-                default:
-                    break;
+        switch(chosen){
+            case 0: {
+                addr1 = 0x431320;
+                addr2 = 0x431320 + 176; //TCB1 --> crash or hang or nothing
+                break;
             }
-			//injector(pid_rtos, 0x431320, 0x431320 + 256);
-            //injector(pid_rtos, addrOS[chosen], addrOS[chosen]+8);
-            return 0;
-		}
-        waitpid(pid_injector, &status2, 0);
+            case 1: {
+                addr1 = 0x431620;
+                addr2 = 0x431620 + 176; //TCB1 --> crash or hang or nothing
+                break;
+            }
+            case 2:
+                //injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3 --> crash or hang or nothing
+                break;
+            case 3:
+                //injector(pid_rtos, 0x431760, 0x431760 + 16);
+                break;
+            default:
+                break;
+        }
+        long inj_addr;
+        thread injection(injector, pid_rtos, addr1, addr2, &inj_addr);
+        injection.join();
+        chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
         //hang handling
         struct timeval timeout = {20,0};
         int rc;
@@ -262,9 +257,9 @@ int main(int argc, char **argv) {
             cout << endl << "Timeot expired, killing process " << endl;
             kill(pid_rtos, SIGKILL);
 
-            logger.addInjection(*inj_addr, elapsed, "Hang");
+            logger.addInjection(inj_addr, elapsed, "Hang");
         }
-        else if (cnt == 2) {
+        else if (cnt > 0) {
             cnt = 0;
         }
         waitpid(pid_rtos, &status, 0);
@@ -272,15 +267,17 @@ int main(int argc, char **argv) {
 
         chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
         cout << endl << "RTOS iter time : " << rtime.count() << endl;
-
+        //handle delay
         cout << endl << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count() << "[ms]" << endl;
 		/*string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
 		cout << endl << "Now printing differences between generated files" << endl;
 		system(cmd.c_str());
 		cout << "print done" << endl;*/
-		checkFiles(pid_golden, pid_rtos, inj_addr, rtime);
+		checkFiles(pid_golden, pid_rtos, inj_addr, elapsed);
 		iter++;
 	}
+
+    logger.printInj();
 
 	return 0;
 }
