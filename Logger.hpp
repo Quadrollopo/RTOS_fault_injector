@@ -44,8 +44,8 @@ public:
     }
     void printInj(){
         for(Injection i : inj){
-            string s_inj = "Address : 0x" << hex << i.address << " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
-            cout << s_inj;
+			cout << "Address : 0x" << hex << i.address <<
+			" --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType << endl;
         }
     }
 
