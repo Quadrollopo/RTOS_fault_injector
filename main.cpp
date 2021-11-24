@@ -134,7 +134,7 @@ long getFileLen(ifstream &file) {
     return (long) length;
 }
 
-int checkFiles(int pid_golden, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
     ifstream golden_output("../files/Golden_execution.txt");
     //ifstream golden_output("../files/Golden_execution" + to_string(pid_golden) + ".txt");
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
@@ -292,7 +292,7 @@ int main(int argc, char **argv) {
 		system(cmd.c_str());
 		cout << "print done" << endl;*/
         if(rc!=0)
-		    checkFiles(pid_golden, pid_rtos, inj_addr, elapsed);
+		    checkFiles(pid_rtos, inj_addr, elapsed);
 		iter++;
 	}
 
