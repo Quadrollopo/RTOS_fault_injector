@@ -214,7 +214,6 @@ int main(int argc, char **argv) {
 			time_golden >> time;
 			gtime = chrono::milliseconds(time);
 			time_golden.close();
-			cout << gtime.count();
 		}
 		else
 			cout << "Can't open Time_golden.txt";
