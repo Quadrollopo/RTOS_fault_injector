@@ -89,9 +89,11 @@
 #include "task.h"
 #include "timers.h"
 #include "semphr.h"
-
+#include <unistd.h>
 /* Local includes. */
 #include "console.h"
+#include <sys/types.h>
+
 
 /* Priorities at which the tasks are created. */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
@@ -128,7 +130,7 @@ static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle );
 /*-----------------------------------------------------------*/
 
 /* The queue used by both tasks. */
-static QueueHandle_t xQueue = NULL;
+static QueueHandle_t xQueue = (void *) 0;
 
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
@@ -138,6 +140,10 @@ static TimerHandle_t xTimer = NULL;
 /* File to read and file to write */
 FILE *fR, *fW;
 
+char string1[8] = "string1";
+char string2[8] = "string2";
+char string3[8] = "string3";
+
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
 void main_blinky( void )
 {
@@ -145,13 +151,15 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( char )*50);
+    char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int pid = getpid();
+    snprintf(falso, 32, "../files/Falso_Dante_%d.txt", pid);
 
-
-
+    console_print(falso);
     if( xQueue != NULL )
 	{
         fR = fopen("../Vero_Dante.txt", "r");
-        fW = fopen("../Falso_Dante.txt", "w");
+        fW = fopen(falso, "w");
         if(fR==NULL || fW==NULL) {
             vQueueDelete(xQueue);
             printf("Non ho trovato i file\n");
@@ -228,11 +236,12 @@ const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS;
 const char* ulValueToSend = "Task";
 const char* name = pcTaskGetName(NULL);
 const char* msg[2] = {ulValueToSend, name};
+char line[50] = {0};
 
 
 	/* Prevent the compiler warning about the unused parameter. */
 	( void ) pvParameters;
-    char line[50];
+
     char *res;
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
@@ -302,6 +311,10 @@ char* ulReceivedValue[2];
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
 			console_print( "Message write on file Falso_Dante\n");
+            console_print(string1);
+            console_print(string2);
+            console_print(string3);
+            console_print("\n");
 		}
 		else if( !strcmp(ulReceivedValue[0], "Timer") )
 		{
