@@ -151,10 +151,9 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( char )*50);
-    char falso[30] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int pid = getpid();
-    //sscanf((const char *) falso, "../Falso_Dante_%d.txt", &pid);
-    snprintf(falso, 30, "../files/Falso_Dante_%d.txt", pid);
+    snprintf(falso, 32, "../files/Falso_Dante_%d.txt", pid);
 
     console_print(falso);
     if( xQueue != NULL )

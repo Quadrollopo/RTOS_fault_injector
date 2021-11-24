@@ -9,11 +9,15 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <limits>
+#include <signal.h>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
 using namespace std;
+
+static volatile int cnt = 0;
+
 /*
 int injector(pid_t pid, long startAddr, long endAddr) {
 	cout << "Child starting injector" << endl;
@@ -113,11 +117,15 @@ void rtos() {
 	//    "../build/freeRTOS");
 }
 
-long getFileLen(ifstream &file){
-    file.ignore( std::numeric_limits<std::streamsize>::max() );
+void sigCHLDHandler(int){
+    cnt++;
+}
+
+long getFileLen(ifstream &file) {
+    file.ignore(std::numeric_limits<std::streamsize>::max());
     std::streamsize length = file.gcount();
     file.clear();   //  Since ignore will have set eof.
-    file.seekg( 0, std::ios_base::beg );
+    file.seekg(0, std::ios_base::beg);
     return (long) length;
 }
 
@@ -127,6 +135,7 @@ int checkFiles(int pid_golden, int pid_rtos) {
 	bool found = false;
     long s1, s2;
 	if (!golden_output.is_open()) {
+        cout << pid_rtos << endl;
 		cout << "Can't open the golden execution output" << endl;
 		return -1;
 	}
@@ -156,8 +165,9 @@ int checkFiles(int pid_golden, int pid_rtos) {
 }
 
 int main(int argc, char **argv) {
+    signal(SIGCHLD, sigCHLDHandler);
 	pid_t pid_golden, pid_injector, pid_rtos;
-	int status, status2;
+    int status, status2;
 	int chosen;
 	if (argc < 2)
 		chosen = 1;
@@ -168,7 +178,6 @@ int main(int argc, char **argv) {
 	if (pid_golden == 0) {
 		//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
 		this_thread::sleep_for(chrono::seconds(1));
-
 		rtos(); //golden
 		return 0;
 	}
@@ -182,7 +191,7 @@ int main(int argc, char **argv) {
 		pid_rtos = fork();
 		if (pid_rtos == 0) {
 			cout << "freeRTOS iter : " << iter << endl;
-			this_thread::sleep_for(chrono::milliseconds (500));
+			this_thread::sleep_for(chrono::milliseconds (300));
 			rtos();
 			return 0;
 		}
@@ -201,13 +210,13 @@ int main(int argc, char **argv) {
 			//injector(pid_rtos, startAddr - 0x400000, endAddr - 0x400000);
             switch(chosen){
                 case 0:
-                    injector(pid_rtos, 0x431320, 0x431320 + 176); //TCB1
+                    injector(pid_rtos, 0x431320, 0x431320 + 176); //TCB1 --> crash or hang or nothing
                     break;
                 case 1:
-                    injector(pid_rtos, 0x431620, 0x431620 + 176); //TCB2
+                    injector(pid_rtos, 0x431620, 0x431620 + 176); //TCB2 --> crash or hang or nothing
                     break;
                 case 2:
-                    injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3
+                    injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3 --> crash or hang or nothing
                     break;
                 case 3:
                     injector(pid_rtos, 0x431760, 0x431760 + 16);
@@ -219,8 +228,19 @@ int main(int argc, char **argv) {
             //injector(pid_rtos, addrOS[chosen], addrOS[chosen]+8);
             return 0;
 		}
-		waitpid(pid_rtos, &status, 0);
-		waitpid(pid_injector, &status2, 0);
+        waitpid(pid_injector, &status2, 0);
+        //hang handling
+        struct timeval timeout = {20,0};
+        int rc;
+        rc = select(0, NULL,NULL,NULL, &timeout );
+        if (rc == 0) {
+            cout << endl << "Timeot expired, killing process " << endl;
+            kill(pid_rtos, SIGKILL);
+        }
+        else if (cnt == 2) {
+            cnt = 0;
+        }
+        waitpid(pid_rtos, &status, 0);
 
 		/*string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
 		cout << endl << "Now printing differences between generated files" << endl;
