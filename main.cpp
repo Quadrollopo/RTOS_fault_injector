@@ -11,11 +11,14 @@
 #include <limits>
 #include <csignal>
 #include <chrono>
+#include "Logger.hpp"
+#include <tuple>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
 using namespace std;
+Logger logger;
 
 static volatile int cnt = 0;
 
@@ -83,7 +86,7 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 	memFile.close();
 	return 0;
 }*/
-int injector(pid_t pid, long startAddr, long endAddr) {
+long injector(pid_t pid, long startAddr, long endAddr) {
     cout << "Child starting injector" << endl;
     fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
     if (!memFile.is_open()) {
@@ -108,7 +111,7 @@ int injector(pid_t pid, long startAddr, long endAddr) {
          bitset<8>(byte).to_string().insert(8 - mask, COLOR_RESET).insert(7 - mask, COLOR_RED)
          << " at 0x" << hex << addr << endl;
     memFile.close();
-    return 0;
+    return addr;
 }
 
 void rtos() {
@@ -130,7 +133,7 @@ long getFileLen(ifstream &file) {
     return (long) length;
 }
 
-int checkFiles(int pid_golden, int pid_rtos) {
+int checkFiles(int pid_golden, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
 	ifstream golden_output("../files/Golden_execution" + to_string(pid_golden) + ".txt");
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
@@ -148,18 +151,25 @@ int checkFiles(int pid_golden, int pid_rtos) {
     s1 = getFileLen(golden_output);
     s2 = getFileLen(rtos_output);
 
-	for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
-		if (g_line != f_line) {
-			found = true;
-			cout << "The output should be" << endl << g_line << endl
-				 << "instead I found" << endl << f_line << endl;
-		}
-	}
-	if (!found)
-		cout << endl << "No differences have been found" << endl;
-    if(s1!=s2)
+    if(s1!=s2) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-
+        logger.addInjection(addr, elapsed, "Crash");
+    }
+    else {
+        for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
+            if (g_line != f_line) {
+                found = true;
+                cout << "The output should be" << endl << g_line << endl
+                     << "instead I found" << endl << f_line << endl;
+            }
+        }
+        if (!found) { //Masked
+            cout << endl << "No differences have been found" << endl;
+            logger.addInjection(addr, elapsed, "Masked");
+        }
+        else
+            logger.addInjection(addr, elapsed, "SDC");
+    }
 	rtos_output.close();
 	golden_output.close();
 	return 0;
@@ -212,19 +222,24 @@ int main(int argc, char **argv) {
         long addr = 0x316e8;
 
         //TODO: Select a random range of address to inject
+        long *inj_addr;
+        chrono::steady_clock::time_point inj = chrono::steady_clock::now();
 
-		pid_injector = fork();
+        pid_injector = fork();
+
 		if (pid_injector == 0) {
             //ptrace(PTRACE_SEIZE, pid_rtos, NULL, NULL);
             this_thread::sleep_for(chrono::milliseconds(rand() % 7000));
 			//injector(pid_rtos, startAddr - 0x400000, endAddr - 0x400000);
             switch(chosen){
-                case 0:
-                    injector(pid_rtos, 0x431320, 0x431320 + 176); //TCB1 --> crash or hang or nothing
+                case 0: {
+                    thread injection1(injector, pid_rtos, 0x431320, 0x431320 + 176); //TCB1 --> crash or hang or nothing
                     break;
-                case 1:
-                    injector(pid_rtos, 0x431620, 0x431620 + 176); //TCB2 --> crash or hang or nothing
+                }
+                case 1: {
+                    thread injection2(injector, pid_rtos, 0x431620, 0x431620 + 176); //TCB2 --> crash or hang or nothing
                     break;
+                }
                 case 2:
                     injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3 --> crash or hang or nothing
                     break;
@@ -243,9 +258,11 @@ int main(int argc, char **argv) {
         struct timeval timeout = {20,0};
         int rc;
         rc = select(0, NULL,NULL,NULL, &timeout );
-        if (rc == 0) {
+        if (rc == 0) { //HANG
             cout << endl << "Timeot expired, killing process " << endl;
             kill(pid_rtos, SIGKILL);
+
+            logger.addInjection(*inj_addr, elapsed, "Hang");
         }
         else if (cnt == 2) {
             cnt = 0;
@@ -261,7 +278,7 @@ int main(int argc, char **argv) {
 		cout << endl << "Now printing differences between generated files" << endl;
 		system(cmd.c_str());
 		cout << "print done" << endl;*/
-		checkFiles(pid_golden, pid_rtos);
+		checkFiles(pid_golden, pid_rtos, inj_addr, rtime);
 		iter++;
 	}
 
