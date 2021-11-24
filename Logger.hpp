@@ -15,12 +15,8 @@ public:
     Injection(long address, const chrono::duration<long, std::ratio<1, 1000>> &elapsed, string faultType
               ) : address(address), elapsed(elapsed), faultType(std::move(faultType)) {}
 
-    Injection(Injection *pInjection) {
-
-    }
-
-    long address;
-    chrono::duration<long, std::ratio<1, 1000>> elapsed;
+    long address{};
+    chrono::duration<long, std::ratio<1, 1000>> elapsed{};
     string faultType;
 };
 
@@ -33,7 +29,9 @@ public:
     Logger() = default;
 
     void addInjection(long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed, string faultType){
-        inj.push_back(new Injection(addr, elapsed, faultType));
+        Injection *i = new Injection(addr, elapsed, std::move(faultType));
+        inj.push_back(*i);
+        cout << "Logger addr = " << hex << inj.back().address << endl;
     }
     void logOnfile(int pid){
         logFile.open("../logs/logFile_" + to_string(pid) + ".txt", ios::in | ios::out);
@@ -43,9 +41,8 @@ public:
         }
     }
     void printInj(){
-        for(Injection i : inj){
-			cout << "Address : 0x" << hex << i.address <<
-			" --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType << endl;
+        for(const Injection i : inj){
+            cout << "Address : 0x" << hex << i.address << " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType << endl;
         }
     }
 

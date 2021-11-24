@@ -111,6 +111,7 @@ int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
          << " at 0x" << hex << addr << endl;
     memFile.close();
     *chosenAddr = addr;
+    cout << hex << *chosenAddr << endl;
     return 0;
 }
 
@@ -133,8 +134,9 @@ long getFileLen(ifstream &file) {
     return (long) length;
 }
 
-int checkFiles(int pid_rtos) {
-	ifstream golden_output("../files/Golden_execution.txt");
+int checkFiles(int pid_golden, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+    ifstream golden_output("../files/Golden_execution.txt");
+    //ifstream golden_output("../files/Golden_execution" + to_string(pid_golden) + ".txt");
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
     long s1, s2;
@@ -151,18 +153,25 @@ int checkFiles(int pid_rtos) {
     s1 = getFileLen(golden_output);
     s2 = getFileLen(rtos_output);
 
-	for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
-		if (g_line != f_line) {
-			found = true;
-			cout << "The output should be" << endl << g_line << endl
-				 << "instead I found" << endl << f_line << endl;
-		}
-	}
-	if (!found)
-		cout << endl << "No differences have been found" << endl;
-    if(s1!=s2)
+    if(s1!=s2) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-
+        logger.addInjection(addr, elapsed, "Crash");
+    }
+    else {
+        for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
+            if (g_line != f_line) {
+                found = true;
+                cout << "The output should be" << endl << g_line << endl
+                     << "instead I found" << endl << f_line << endl;
+            }
+        }
+        if (!found) { //Masked
+            cout << endl << "No differences have been found" << endl;
+            logger.addInjection(addr, elapsed, "Masked");
+        }
+        else
+            logger.addInjection(addr, elapsed, "SDC");
+    }
 	rtos_output.close();
 	golden_output.close();
 	return 0;
@@ -220,7 +229,7 @@ int main(int argc, char **argv) {
 	}
 	gold.close();
 	int iter = 0;
-	while (iter < 8) {
+	while (iter < 3) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -231,13 +240,7 @@ int main(int argc, char **argv) {
 			rtos();
 			return 0;
 		}
-		long startAddr = 0x431000, endAddr = 0x432000;
-		//long addresses[6] = {0x433ba0, 0x433ba8, 0x4316e8, 0x4316f0, 0x431700, 0x4311f8};
-        string variables[7] = {"xNextTaskUnblockTime", "xIdleTaskHandle", "xTickCount", "xSchedulerRunning", "xYieldPending", "uxTaskNumber", "xIdleTaskHandle"};
-        long addrOS[7] = {0x431a28, 0x431a30, 0x4319f0, 0x431a00, 0x431a10, 0x431a20, 0x431a30};
         long addr1, addr2;
-
-        //TODO: Select a random range of address to inject
 
         switch(chosen){
             case 0: {
@@ -262,6 +265,7 @@ int main(int argc, char **argv) {
         long inj_addr;
         thread injection(injector, pid_rtos, addr1, addr2, &inj_addr);
         injection.join();
+        cout << "Chosen addr : " << inj_addr << endl;
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
         //hang handling
         struct timeval timeout = {20,0};
@@ -287,7 +291,8 @@ int main(int argc, char **argv) {
 		cout << endl << "Now printing differences between generated files" << endl;
 		system(cmd.c_str());
 		cout << "print done" << endl;*/
-		checkFiles(pid_rtos);
+        if(rc!=0)
+		    checkFiles(pid_golden, pid_rtos, inj_addr, elapsed);
 		iter++;
 	}
 
