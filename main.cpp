@@ -9,7 +9,8 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <limits>
-#include <signal.h>
+#include <csignal>
+#include <chrono>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -174,7 +175,8 @@ int main(int argc, char **argv) {
 	else
 		chosen = (int) strtol(argv[1], nullptr, 10);
 
-	pid_golden = fork();
+    std::chrono::steady_clock::time_point bgold = std::chrono::steady_clock::now();
+    pid_golden = fork();
 	if (pid_golden == 0) {
 		//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
 		this_thread::sleep_for(chrono::seconds(1));
@@ -182,12 +184,20 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	waitpid(pid_golden, &status, 0);
+    //Golden time
+    std::chrono::steady_clock::time_point egold = std::chrono::steady_clock::now();
+    chrono::duration<long, std::ratio<1, 1000>> gtime = chrono::duration_cast<std::chrono::milliseconds>(egold - bgold);
+    cout << endl << "Golden time : " << gtime.count() << endl;
+
+    cnt = 0;
     const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution" + to_string(pid_golden) + ".txt";
-	system((const char *) cmd.c_str());
+    system((const char *) cmd.c_str());
 
 	int iter = 0;
 	while (iter < 8) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
+        chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 		pid_rtos = fork();
 		if (pid_rtos == 0) {
 			cout << "freeRTOS iter : " << iter << endl;
@@ -241,7 +251,12 @@ int main(int argc, char **argv) {
             cnt = 0;
         }
         waitpid(pid_rtos, &status, 0);
+        chrono::steady_clock::time_point end = chrono::steady_clock::now();
 
+        chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+        cout << endl << "RTOS iter time : " << rtime.count() << endl;
+
+        cout << endl << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count() << "[ms]" << endl;
 		/*string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
 		cout << endl << "Now printing differences between generated files" << endl;
 		system(cmd.c_str());
