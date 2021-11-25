@@ -230,7 +230,7 @@ int main(int argc, char **argv) {
 	}
 	gold.close();
 	int iter = 0;
-	while (iter < 3) {
+	while (iter < 8) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -257,20 +257,20 @@ int main(int argc, char **argv) {
                 addr2 = 0x431400 + 544;
                 break;
             case 3:
-                addr1 = 0x431200; //
-                addr2 = 0x4312f0;
+                addr1 = 0x431da0; //xStaticTimerQueue.3692
+                addr2 = 0x431e50;
                 break;
             case 4:
-                addr1 = 0x431100; //
-                addr2 = 0x431200;
+                addr1 = 0x431a80; //xActiveTimerList1
+                addr2 = 0x431ac0;
                 break;
             case 5:
-                addr1 = 0x431300; //
-                addr2 = 0x431400;
+                addr1 = 0x431ac0; //xActiveTimerList2
+                addr2 = 0x431af0;
                 break;
             case 6:
-                addr1 = 0x431400; //
-                addr2 = 0x431500;
+                addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes
+                addr2 = 0x431b10;
                 break;
             default:
                 break;
@@ -283,7 +283,7 @@ int main(int argc, char **argv) {
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
 
         //hang handling
-        struct timeval timeout = {30,0};
+        struct timeval timeout = {40,0};
         int hang;
         hang = select(0, NULL,NULL,NULL, &timeout );
         if (hang == 0) { //HANG
