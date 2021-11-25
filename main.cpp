@@ -84,6 +84,7 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 	memFile.close();
 	return 0;
 }*/
+
 int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
     this_thread::sleep_for(chrono::milliseconds(rand() % 7000));
     cout << "Child starting injector" << endl;
@@ -118,8 +119,6 @@ int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
 void rtos() {
 	cout << endl << "Child running rtos" << endl;
 	execve("../build/freeRTOS", nullptr, nullptr);
-	//execl("../build/freeRTOS",
-	//    "../build/freeRTOS");
 }
 
 void sigCHLDHandler(int){
@@ -136,7 +135,6 @@ long getFileLen(ifstream &file) {
 
 int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
     ifstream golden_output("../files/Golden_execution.txt");
-    //ifstream golden_output("../files/Golden_execution" + to_string(pid_golden) + ".txt");
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
     long s1, s2;
@@ -202,7 +200,6 @@ int main(int argc, char **argv) {
 		}
 		waitpid(pid_golden, &status, 0);
 		//Golden time
-
 		gtime = chrono::duration_cast<chrono::milliseconds>(
 				chrono::steady_clock::now() - bgold);
 		cout << endl << "Golden time : " << gtime.count() << endl;
@@ -229,7 +226,7 @@ int main(int argc, char **argv) {
 	}
 	gold.close();
 	int iter = 0;
-	while (iter < 3) {
+	while (iter < 60) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -243,30 +240,44 @@ int main(int argc, char **argv) {
         long addr1, addr2;
 
         switch(chosen){
-            case 0: {
-                addr1 = 0x431320;
-                addr2 = 0x431320 + 176; //TCB1 --> crash or hang or nothing
+            case 0:
+                addr1 = 0x431340; //xIdleTaskTCB.4315
+                addr2 = 0x431340 + 192;
                 break;
-            }
-            case 1: {
-                addr1 = 0x431620;
-                addr2 = 0x431620 + 176; //TCB1 --> crash or hang or nothing
+            case 1:
+                addr1 = 0x431640; //xTimerTaskTCB
+                addr2 = 0x431620 + 176;
                 break;
-            }
             case 2:
-                //injector(pid_rtos, 0x4313e0, 0x4313e0 + 576); //TCB3 --> crash or hang or nothing
+                addr1 = 0x431400;//uxIdleTaskStack.4316
+                addr2 = 0x431400 + 544;
                 break;
             case 3:
-                //injector(pid_rtos, 0x431760, 0x431760 + 16);
+                addr1 = 0x431200; //
+                addr2 = 0x431220;
+                break;
+            case 4:
+                addr1 = 0x431100; //
+                addr2 = 0x431200;
+                break;
+            case 5:
+                addr1 = 0x431300; //
+                addr2 = 0x431400;
+                break;
+            case 6:
+                addr1 = 0x431400; //
+                addr2 = 0x431500;
                 break;
             default:
                 break;
         }
+
         long inj_addr;
         thread injection(injector, pid_rtos, addr1, addr2, &inj_addr);
         injection.join();
-        cout << "Chosen addr : " << inj_addr << endl;
+
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
+
         //hang handling
         struct timeval timeout = {20,0};
         int rc;
@@ -285,13 +296,11 @@ int main(int argc, char **argv) {
 
         chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
         cout << endl << "RTOS iter time : " << rtime.count() << endl;
-        //handle delay
-        cout << endl << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count() << "[ms]" << endl;
-		/*string cmd = "diff ../Golden_execution.txt ../Falso_Dante.txt >> ../diffs/diff" + to_string(iter) + ".txt";
-		cout << endl << "Now printing differences between generated files" << endl;
-		system(cmd.c_str());
-		cout << "print done" << endl;*/
-        if(rc!=0)
+
+        //TODO : handle delay
+        cout << endl << "Time difference = " << to_string(chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count()) << "[ms]" << endl;
+
+        if(rc!=0) //if not hang
 		    checkFiles(pid_rtos, inj_addr, elapsed);
 		iter++;
 	}

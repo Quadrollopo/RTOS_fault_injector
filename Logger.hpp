@@ -10,6 +10,8 @@ using namespace std;
 //per ogni esecuzione stampare:
 //indirizzo + tempo iniezione + tipo di fault
 
+//TODO: add an address-object map to identify the injected object
+
 class Injection{
 public:
     Injection(long address, const chrono::duration<long, std::ratio<1, 1000>> &elapsed, string faultType
