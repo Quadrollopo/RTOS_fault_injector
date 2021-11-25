@@ -138,6 +138,8 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
 	ifstream rtos_output( "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
     long s1, s2;
+    int error = 0; // 0 --> Masked, 1 --> SDC, 2 --> Crash
+
 	if (!golden_output.is_open()) {
         cout << pid_rtos << endl;
 		cout << "Can't open the golden execution output" << endl;
@@ -154,11 +156,13 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
     if(s1!=s2) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
         logger.addInjection(addr, elapsed, "Crash");
+        error = 2;
     }
     else {
         for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
             if (g_line != f_line) {
                 found = true;
+                error = 1;
                 cout << "The output should be" << endl << g_line << endl
                      << "instead I found" << endl << f_line << endl;
             }
@@ -172,7 +176,7 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
     }
 	rtos_output.close();
 	golden_output.close();
-	return 0;
+	return error;
 }
 
 int main(int argc, char **argv) {
@@ -226,7 +230,7 @@ int main(int argc, char **argv) {
 	}
 	gold.close();
 	int iter = 0;
-	while (iter < 60) {
+	while (iter < 3) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -254,7 +258,7 @@ int main(int argc, char **argv) {
                 break;
             case 3:
                 addr1 = 0x431200; //
-                addr2 = 0x431220;
+                addr2 = 0x4312f0;
                 break;
             case 4:
                 addr1 = 0x431100; //
@@ -279,10 +283,10 @@ int main(int argc, char **argv) {
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
 
         //hang handling
-        struct timeval timeout = {20,0};
-        int rc;
-        rc = select(0, NULL,NULL,NULL, &timeout );
-        if (rc == 0) { //HANG
+        struct timeval timeout = {30,0};
+        int hang;
+        hang = select(0, NULL,NULL,NULL, &timeout );
+        if (hang == 0) { //HANG
             cout << endl << "Timeot expired, killing process " << endl;
             kill(pid_rtos, SIGKILL);
 
@@ -297,11 +301,17 @@ int main(int argc, char **argv) {
         chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
         cout << endl << "RTOS iter time : " << rtime.count() << endl;
 
-        //TODO : handle delay
-        cout << endl << "Time difference = " << to_string(chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count()) << "[ms]" << endl;
+        int err = 0;
+        if(hang!=0)
+            err = checkFiles(pid_rtos, inj_addr, elapsed);
 
-        if(rc!=0) //if not hang
-		    checkFiles(pid_rtos, inj_addr, elapsed);
+        long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
+
+        if(abs(timeDifference) > 800 && hang != 0 && err!=2) //delay detected when there was not a crash or a hang
+            logger.addInjection(inj_addr, elapsed, "Delay");
+
+        cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
+
 		iter++;
 	}
 
