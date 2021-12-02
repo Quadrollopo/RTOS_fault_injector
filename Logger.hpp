@@ -12,7 +12,8 @@ using namespace std;
 //indirizzo + tempo iniezione + tipo di fault
 
 //TODO: add an address-object map to identify the injected object
-
+//this map needs to be re-filled every time RTOS changes
+//gdb_script can be used to extract the addresses of global variables
 map<long, string> rtosObjects;
 
 class Injection{
