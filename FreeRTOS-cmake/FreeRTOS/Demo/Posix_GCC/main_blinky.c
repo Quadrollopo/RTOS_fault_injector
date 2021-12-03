@@ -135,6 +135,9 @@ static QueueHandle_t xQueue = (void *) 0;
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
 
+TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
+
+
 /*-----------------------------------------------------------*/
 
 /* File to read and file to write */
@@ -232,7 +235,7 @@ static void myReceiver(void* params) {
 static void prvQueueSendTask( void *pvParameters )
 {
 TickType_t xNextWakeTime;
-const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS;
+//const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
 const char* ulValueToSend = "Task";
 const char* name = pcTaskGetName(NULL);
 const char* msg[2] = {ulValueToSend, name};
@@ -246,7 +249,6 @@ char line[50] = {0};
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
 
-
 	for( ;; )
 	{
         res = fgets(line, 50, fR);
@@ -257,7 +259,7 @@ char line[50] = {0};
 		The block time is specified in ticks, pdMS_TO_TICKS() was used to
 		convert a time specified in milliseconds into a time specified in ticks.
 		While in the Blocked state this task will not consume any CPU time. */
-		vTaskDelayUntil( &xNextWakeTime, xBlockTime );
+		xTaskDelayUntil( &xNextWakeTime, xBlockTime );
 		/* Send to the queue - causing the queue receive task to unblock and
 		write to the console.  0 is used as the block time so the send operation
 		will not block - it shouldn't need to block as the queue should always
@@ -321,7 +323,7 @@ char* ulReceivedValue[2];
             fprintf(fW, "%s", ulReceivedValue[1]);
 			console_print( "Message received from software timer\n" );
             N++;
-            if(N == 3)
+            if(N == 8)
                 vTaskEndScheduler();
 		}
 		else

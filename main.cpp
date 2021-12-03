@@ -153,7 +153,7 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
     s1 = getFileLen(golden_output);
     s2 = getFileLen(rtos_output);
 
-    if(s1!=s2) { // Crash
+    if(s2==0) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
         logger.addInjection(addr, elapsed, "Crash");
         error = 2;
@@ -243,10 +243,12 @@ int main(int argc, char **argv) {
 		}
         long addr1, addr2;
 
+        //opzione1 ->
+
         switch(chosen){
             case 0:
-                addr1 = 0x431340; //xIdleTaskTCB.4315
-                addr2 = 0x431340 + 192;
+                addr1 = 0x431208; //DELAY!!
+                addr2 = 0x431208 + 7;
                 break;
             case 1:
                 addr1 = 0x431640; //xTimerTaskTCB
