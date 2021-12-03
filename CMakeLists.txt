@@ -5,7 +5,7 @@ if(UNIX)
 	set(CMAKE_C_FLAGS "-lstdc++ -ggdb3 -O0 -DprojCOVERAGE_TEST=0 -D_WINDOWS_")
 	set(CMAKE_EXE_LINKER_FLAGS "-lstdc++ -ggdb3 -O0 -pthread -lpcap -no-pie")
 
-	add_executable(pds main.cpp Logger.hpp)
+	add_executable(pds main.cpp Logger.hpp Target.hpp)
 
 	#set(FREERTOS_DIR_REL "../../FreeRTOS")
 	set(FREERTOS_DIR_REL "FreeRTOS-cmake/FreeRTOS")

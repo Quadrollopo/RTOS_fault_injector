@@ -11,6 +11,7 @@
 #include <limits>
 #include "Logger.hpp"
 #include <tuple>
+#include "Target.hpp"
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"

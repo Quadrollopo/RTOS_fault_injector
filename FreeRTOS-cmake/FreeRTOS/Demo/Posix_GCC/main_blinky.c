@@ -167,6 +167,7 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
             vQueueDelete(xQueue);
             printf("Non ho trovato i file\n");
             if(fR != NULL)
+                printf("Non ho trovato Vero_Dante.txt");
                 fclose(fR);
         }
         else {
