@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ private:
     long address;
     int size;
 public:
-    Target(string name, long address, int size) : name(name), address(address), size(size) {}
+    Target(string name, long address, int size) : name(std::move(name)), address(address), size(size) {}
 
     string getName() const {
         return name;

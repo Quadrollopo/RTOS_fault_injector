@@ -11,7 +11,6 @@
 #include <limits>
 #include "Logger.hpp"
 #include <tuple>
-#include "Target.hpp"
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -87,7 +86,7 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 }*/
 
 int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
-    this_thread::sleep_for(chrono::milliseconds(rand() % 7000));
+    this_thread::sleep_for(chrono::milliseconds(rand() % 9000));
     cout << "Child starting injector" << endl;
     fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
     if (!memFile.is_open()) {
@@ -124,6 +123,11 @@ void rtos() {
 
 void sigCHLDHandler(int){
     cnt++;
+}
+
+void sigINTHandler(int){
+    logger.printInj();
+    exit(0);
 }
 
 long getFileLen(ifstream &file) {
@@ -182,6 +186,7 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
 
 int main(int argc, char **argv) {
     signal(SIGCHLD, sigCHLDHandler);
+    signal(SIGINT, sigINTHandler);
 	pid_t pid_golden, pid_injector, pid_rtos;
     int status, status2;
 	int chosen;
@@ -231,7 +236,7 @@ int main(int argc, char **argv) {
 	}
 	gold.close();
 	int iter = 0;
-	while (iter < 8) {
+	while (iter < 4) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -252,20 +257,20 @@ int main(int argc, char **argv) {
                 addr2 = 0x431208 + 7;
                 break;
             case 1:
-                addr1 = 0x431640; //xTimerTaskTCB
-                addr2 = 0x431620 + 176;
+                addr1 = 0x431720; //xStaticQueue
+                addr2 = 0x431720 + 168;
                 break;
             case 2:
-                addr1 = 0x431400;//uxIdleTaskStack.4316
-                addr2 = 0x431400 + 544;
+                addr1 = 0x434380;//xTimerBuffer
+                addr2 = 0x434380 + 88;
                 break;
             case 3:
-                addr1 = 0x431da0; //xStaticTimerQueue.3692
-                addr2 = 0x431e50;
+                addr1 = 0x4344a0; //xStack1
+                addr2 = 0x4344a0 + 200;
                 break;
             case 4:
-                addr1 = 0x431a80; //xActiveTimerList1
-                addr2 = 0x431ac0;
+                addr1 = 0x433d40; //xStack2
+                addr2 = 0x433d40 + 200;
                 break;
             case 5:
                 addr1 = 0x431ac0; //xActiveTimerList2

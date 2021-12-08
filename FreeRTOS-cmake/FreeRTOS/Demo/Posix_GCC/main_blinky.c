@@ -131,11 +131,29 @@ static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle );
 
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = (void *) 0;
+static StaticQueue_t xStaticQueue;
+uint8_t ucQueueStorageArea[ mainQUEUE_LENGTH * 50 ];
+
+/* Structure that will hold the TCB of the task being created. */
+StaticTask_t xTaskBuffer1;
+StaticTask_t xTaskBuffer2;
+
+/* Buffer that the task being created will use as its stack.  Note this is
+an array of StackType_t variables.  The size of StackType_t is dependent on
+the RTOS port. */
+StackType_t xStack1[ 200 ];
+StackType_t xStack2[ 200 ];
+
+/* An array of StaticTimer_t structures, which are used to store
+ the state of each created timer. */
+StaticTimer_t xTimerBuffer;
 
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
+static TaskHandle_t task1 = NULL;
+static TaskHandle_t task2 = NULL;
 
-TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
+//TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
 
 
 /*-----------------------------------------------------------*/
@@ -143,17 +161,13 @@ TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that 
 /* File to read and file to write */
 FILE *fR, *fW;
 
-char string1[8] = "string1";
-char string2[8] = "string2";
-char string3[8] = "string3";
-
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
 void main_blinky( void )
 {
 const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
 	/* Create the queue. */
-	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( char )*50);
+	xQueue = xQueueCreateStatic( mainQUEUE_LENGTH, sizeof( char )*50, ucQueueStorageArea, &xStaticQueue);
     char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int pid = getpid();
     snprintf(falso, 32, "../files/Falso_Dante_%d.txt", pid);
@@ -173,23 +187,23 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
         else {
             /* Start the two tasks as described in the comments at the top of this
             file. */
-            xTaskCreate( /*myReceiver,*/ prvQueueReceiveTask,            /* The function that implements the task. */
+            task1 = xTaskCreateStatic( /*myReceiver,*/ prvQueueReceiveTask,            /* The function that implements the task. */
                                          "RX",                            /* The text name assigned to the task - for debug only as it is not used by the kernel. */
                                          configMINIMAL_STACK_SIZE,        /* The size of the stack to allocate to the task. */
                                          NULL,                            /* The parameter passed to the task - not used in this simple case. */
                                          mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority assigned to the task. */
-                                         NULL);                            /* The task handle is not required, so NULL is passed. */
+                                         xStack1, &xTaskBuffer1);                            /* The task handle is not required, so NULL is passed. */
 
-            xTaskCreate(prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL);
+            task2 = xTaskCreateStatic(prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, xStack2, &xTaskBuffer2);
             //xTaskCreate( mySender, /*prvQueueSendTask,*/ "Sender", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
             /* Create the software timer, but don't start it yet. */
-            xTimer = xTimerCreate(
+            xTimer = xTimerCreateStatic(
                     "Timer",                /* The text name assigned to the software timer - for debug only as it is not used by the kernel. */
                     xTimerPeriod,        /* The period of the software timer in ticks. */
                     pdTRUE,                /* xAutoReload is set to pdTRUE. */
                     NULL,                /* The timer's ID is not used. */
-                    prvQueueSendTimerCallback);/* The function executed when the timer expires. */
+                    prvQueueSendTimerCallback, &xTimerBuffer);/* The function executed when the timer expires. */
 
             if (xTimer != NULL) {
                 xTimerStart(xTimer, 0);
@@ -236,7 +250,7 @@ static void myReceiver(void* params) {
 static void prvQueueSendTask( void *pvParameters )
 {
 TickType_t xNextWakeTime;
-//const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
+const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
 const char* ulValueToSend = "Task";
 const char* name = pcTaskGetName(NULL);
 const char* msg[2] = {ulValueToSend, name};
@@ -291,7 +305,11 @@ const char* ulValueToSend[2] = {"Timer", "Message from Timer!\n"};
 
 static void prvQueueReceiveTask( void *pvParameters )
 {
-char* ulReceivedValue[2];
+
+    char string1[8] = "string1";
+    char string2[8] = "string2";
+    char string3[8] = "string3";
+    char* ulReceivedValue[2];
     int N = 0;
 	/* Prevent the compiler warning about the unused parameter. */
 	( void ) pvParameters;
@@ -314,17 +332,17 @@ char* ulReceivedValue[2];
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
 			console_print( "Message write on file Falso_Dante\n");
-            console_print(string1);
-            console_print(string2);
-            console_print(string3);
-            console_print("\n");
+            //console_print(string1);
+            //console_print(string2);
+            //console_print(string3);
+            //console_print("\n");
 		}
 		else if( !strcmp(ulReceivedValue[0], "Timer") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
 			console_print( "Message received from software timer\n" );
             N++;
-            if(N == 8)
+            if(N == 4)
                 vTaskEndScheduler();
 		}
 		else
