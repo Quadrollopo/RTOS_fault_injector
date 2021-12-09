@@ -165,7 +165,7 @@ void main_blinky( void )
 
     /* Create the queue. */
     xQueue = xQueueCreateStatic( mainQUEUE_LENGTH, sizeof( char )*50, ucQueueStorageArea, &xStaticQueue);
-x    char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int pid = 0; //getpid
     snprintf(falso, 32, "../files/Falso_Dante_%d.txt", pid);
 
