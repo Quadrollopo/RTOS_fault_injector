@@ -73,6 +73,7 @@ int main(int argc, char **argv){
             cout << "Can't create Time_golden.txt";
         time_golden.close();
         cnt = 0;
+        char oldname[] =  "..\\files\\Falso_Dante_";
 
         const string cmd = "rename ../files/Falso_Dante_" + to_string(pid_golden) + ".txt Golden_execution.txt";
         system((const char *) cmd.c_str());
