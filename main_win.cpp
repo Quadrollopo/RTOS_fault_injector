@@ -27,6 +27,7 @@ int main(int argc, char **argv){
     int chosen;
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
+    unsigned int pid_golden;
     chrono::duration<long, ratio<1, 1000>> gtime{};
     if (argc < 2)
         chosen = 1;
@@ -54,15 +55,42 @@ int main(int argc, char **argv){
         {
             printf( "CreateProcess failed (%d).\n", GetLastError() );
             return -1;
+        }else{
+            DWORD pid_golden_DWORD = GetProcessId(pi.hProcess);
+            pid_golden = pid_golden_DWORD;
         }
 
         // Wait until child process exits.
         WaitForSingleObject( pi.hProcess, INFINITE );
 
+        gtime = chrono::duration_cast<chrono::milliseconds>(
+                chrono::steady_clock::now() - bgold);
+        cout << endl << "Golden time : " << gtime.count() << endl;
+        ofstream time_golden("../files/Time_golden.txt");
+        if (time_golden)
+            time_golden << gtime.count();
+        else
+            cout << "Can't create Time_golden.txt";
+        time_golden.close();
+        cnt = 0;
+
+        const string cmd = "rename ../files/Falso_Dante_" + to_string(pid_golden) + ".txt Golden_execution.txt";
+        system((const char *) cmd.c_str());
+
         // Close process and thread handles.
         CloseHandle( pi.hProcess );
         CloseHandle( pi.hThread );
+    }else{
+        cout << "Found another golden execution output, skipping execution..." << endl;
+        ifstream time_golden("../files/Time_golden.txt");
+        if (time_golden){
+            long time;
+            time_golden >> time;
+            gtime = chrono::milliseconds(time);
+            time_golden.close();
+        }
+        else
+            cout << "Can't open Time_golden.txt";
     }
-    cout<< "Hello world!\n";
     return 0;
 }
