@@ -167,12 +167,12 @@ void main_blinky( void )
     xQueue = xQueueCreateStatic( mainQUEUE_LENGTH, sizeof( char )*50, ucQueueStorageArea, &xStaticQueue);
     char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     DWORD pid = GetCurrentProcessId(); //getpid
-    snprintf(falso, 32, "../files/Falso_Dante_%d.txt\n", (unsigned int)pid);
+    snprintf(falso, 32, "../files/Falso_Dante_%d.txt", (unsigned int)pid);
 
     printf(falso);
     if( xQueue != NULL )
     {
-        fR = fopen("../Vero_Dante.txt", "r");
+        fR = fopen("..\\Vero_Dante.txt", "r");
         fW = fopen(falso, "w");
         if(fR==NULL || fW==NULL) {
             vQueueDelete(xQueue);
@@ -339,7 +339,7 @@ static void prvQueueReceiveTask( void *pvParameters )
             fprintf(fW, "%s", ulReceivedValue[1]);
             printf( "Message received from software timer\n" );
             N++;
-            if(N == 4)
+            if(N == 3)
                 vTaskEndScheduler();
         }
         else

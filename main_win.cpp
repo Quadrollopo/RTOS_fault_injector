@@ -66,7 +66,7 @@ int main(int argc, char **argv){
         gtime = chrono::duration_cast<chrono::milliseconds>(
                 chrono::steady_clock::now() - bgold);
         cout << endl << "Golden time : " << gtime.count() << endl;
-        ofstream time_golden("../files/Time_golden.txt");
+        ofstream time_golden("..\\files\\Time_golden.txt");
         if (time_golden)
             time_golden << gtime.count();
         else
@@ -75,7 +75,7 @@ int main(int argc, char **argv){
         cnt = 0;
         char oldname[] =  "..\\files\\Falso_Dante_";
 
-        const string cmd = "rename ../files/Falso_Dante_" + to_string(pid_golden) + ".txt Golden_execution.txt";
+        const string cmd = "rename ..\\files\\Falso_Dante_" + to_string(pid_golden) + ".txt Golden_execution.txt";
         system((const char *) cmd.c_str());
 
         // Close process and thread handles.
