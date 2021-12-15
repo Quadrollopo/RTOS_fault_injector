@@ -161,6 +161,7 @@ FILE *fR, *fW;
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
 void main_blinky( void )
 {
+    printf("Start\n");
     const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
     /* Create the queue. */
@@ -176,9 +177,10 @@ void main_blinky( void )
         fW = fopen(falso, "w");
         if(fR==NULL || fW==NULL) {
             vQueueDelete(xQueue);
-            printf("Non ho trovato i file\n");
-            if(fR != NULL)
-                printf("Non ho trovato Vero_Dante.txt");
+            if(fR == NULL)
+                printf("Non ho trovato Vero_Dante.txt\n");
+            if(fW == NULL)
+                printf("Non ho trovato Falso_Dante_%d.txt\n", (unsigned int)pid);
             fclose(fR);
         }
         else {
