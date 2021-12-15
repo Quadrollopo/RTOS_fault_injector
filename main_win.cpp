@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <bitset>
 #include <random>
@@ -8,12 +7,12 @@
 #include <cstdlib>
 #include <limits>
 #include "Logger.hpp"
-#include <tuple>
 #include <windows.h>
 #include <tchar.h>
 #include <processthreadsapi.h>
 #include <memoryapi.h>
-#include <winsock.h>
+#include <fileapi.h>
+#include <signal.h>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
@@ -53,12 +52,32 @@ int injector(PROCESS_INFORMATION pi, long startAddr, long endAddr, long *chosenA
     return 0;
 }
 
-long getFileLen(ifstream &file) {
-    //file.ignore(reinterpret_cast<streamsize>(std::numeric_limits<std::streamsize>::max()));
-    std::streamsize length = file.gcount();
-    file.clear();   //  Since ignore will have set eof.
-    file.seekg(0, std::ios_base::beg);
-    return (long) length;
+BOOL WINAPI ConsoleHandler(DWORD dwType)
+{
+    cout << "helo" << endl;
+    switch(dwType) {
+        case CTRL_C_EVENT:
+            printf("ctrl-c\n");
+            break;
+        case CTRL_BREAK_EVENT:
+            printf("break\n");
+            break;
+        default:
+            printf("Some other event\n");
+    }
+    return TRUE;
+}
+
+long getFileLen(const char* file) {
+    HANDLE h = CreateFile(file,                // name of the write
+                       GENERIC_READ,          // open for writing
+                       0,                      // do not share
+                       NULL,                   // default security
+                       OPEN_EXISTING,             //
+                       FILE_ATTRIBUTE_NORMAL,  // normal file
+                       NULL);                  // no attr. template
+    long len = (long) GetFileSize( h, NULL);
+    return len;
 }
 
 int checkFiles(unsigned int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
@@ -78,9 +97,8 @@ int checkFiles(unsigned int pid_rtos, long addr, chrono::duration<long, std::rat
         cout << "Can't open the rtos execution output" << endl;
         return -1;
     }
-
-    s1 = getFileLen(golden_output);
-    s2 = getFileLen(rtos_output);
+    s1 = getFileLen("../files/Golden_execution.txt");
+    s2 = getFileLen(("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt").c_str());
     if(s2==0) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
         logger.addInjection(addr, elapsed, "Crash");
@@ -108,7 +126,6 @@ int checkFiles(unsigned int pid_rtos, long addr, chrono::duration<long, std::rat
 }
 
 int main(int argc, char **argv){
-
     int status, status2;
     int chosen;
     STARTUPINFO si;
