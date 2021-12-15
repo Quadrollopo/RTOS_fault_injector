@@ -78,9 +78,9 @@ int checkFiles(unsigned int pid_rtos, long addr, chrono::duration<long, std::rat
         cout << "Can't open the rtos execution output" << endl;
         return -1;
     }
+
     s1 = getFileLen(golden_output);
     s2 = getFileLen(rtos_output);
-
     if(s2==0) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
         logger.addInjection(addr, elapsed, "Crash");
@@ -161,8 +161,7 @@ int main(int argc, char **argv){
 
 
         // Close process and thread handles.
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
+
     }else{
         cout << "Found another golden execution output, skipping execution..." << endl;
         ifstream time_golden("../files/Time_golden.txt");
@@ -180,7 +179,11 @@ int main(int argc, char **argv){
     while (iter < 4) {
         cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        STARTUPINFO si = {sizeof(si)};
 
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
         if (!CreateProcess(NULL,   // No module name (use command line)
                            "./RTOSDemo.exe",        // Command line
                            NULL,           // Process handle not inheritable
@@ -240,36 +243,36 @@ int main(int argc, char **argv){
 
         //hang handling
         struct timeval timeout = {40,0};
-        int hang;
-        hang = select(0, nullptr, nullptr, nullptr, &timeout );
-        if (hang == 0) { //HANG
+        DWORD hang;
+        hang = WaitForSingleObject(pi.hProcess, gtime.count()*2);
+        if (hang == WAIT_TIMEOUT) { //HANG
             LPDWORD type_error = nullptr;
             cout << endl << "Timeot expired, killing process " << endl;
             TerminateProcess(pi.hProcess, GetExitCodeProcess(pi.hProcess, type_error));
 
             logger.addInjection(inj_addr, elapsed, "Hang");
         }
-        else if (cnt > 0) {
-            cnt = 0;
-        }
-        WaitForSingleObject(pi.hProcess, INFINITE);
+
+
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
 
         chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
         cout << endl << "RTOS iter time : " << rtime.count() << endl;
 
         int err = 0;
-        if(hang!=0)
+        if(hang!=WAIT_TIMEOUT)
             err = checkFiles((unsigned int)pid_rtos, inj_addr, elapsed);
 
         long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
 
-        if(abs(timeDifference) > 800 && hang != 0 && err!=2) //delay detected when there was not a crash or a hang
+        if(abs(timeDifference) > 800 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
             logger.addInjection(inj_addr, elapsed, "Delay");
 
         cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
 
         iter++;
     }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
     return 0;
 }
