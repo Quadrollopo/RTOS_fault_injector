@@ -20,71 +20,6 @@ Logger logger;
 
 static volatile int cnt = 0;
 
-/*
-int injector(pid_t pid, long startAddr, long endAddr) {
-	cout << "Child starting injector" << endl;
-	ifstream mapfile;
-	mapfile.open("/proc/" + to_string(pid) + "/maps");
-	if(!mapfile.is_open()){
-		cout << "Can't open file /proc/" + to_string(pid) + "/maps" << endl;
-		return 2;
-	}
-	string line;
-	int numAddrs = 0;
-	long address[20][2];
-	while (getline(mapfile, line) && mapfile.good() && line.find("heap") == string::npos);
-	while (getline(mapfile, line) && mapfile.good() && line.find('/') == string::npos){
-		string perms;
-		perms = line.substr(line.find(' '), 4);
-		if (perms.find('w') == string::npos || perms.find('r') == string::npos)
-			continue;
-		size_t separator = line.find('-');
-		address[numAddrs][0] = stol(line.substr(0, separator), nullptr, 16);
-		address[numAddrs][1] = stol(line.substr(separator + 1, separator), nullptr, 16);
-		numAddrs++;
-	}
-	mapfile.close();
-	if(numAddrs == 0){
-		cout << "no address found" << endl;
-		return 1;
-	}
-
-	fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
-	if (!memFile.is_open()) {
-		cout << "Can't open file /proc/" + to_string(pid) + "/mem" << endl;
-		return -1;
-	}
-	random_device generator;
-	uniform_int_distribution<int> bit_distribution(0, 7);
-	uniform_int_distribution<int> range_addrs(0, numAddrs-1);
-	for (int i = 0; i < 100; ++i) {
-		uint8_t byte, mask = bit_distribution(generator);
-		int index = range_addrs(generator);
-		uniform_int_distribution<long> address_distribution(address[index][0], address[index][1]);
-		long addr = address_distribution(generator);
-		memFile.seekg(addr);
-		byte = memFile.peek();
-		for(int timer = 0; timer < 1000 && byte == 0; timer++){
-			index = range_addrs(generator);
-			uniform_int_distribution<long> address_distribution(address[index][0], address[index][1]);
-			addr = address_distribution(generator);
-			memFile.seekg(addr);
-			byte = memFile.peek();
-		}
-
-		//Flipbit
-		byte ^= 1 << mask;
-		memFile.put((char) byte);
-
-		cout << "Modified " <<
-			 // put red color for the bit flipped
-			 bitset<8>(byte).to_string().insert(8 - mask, COLOR_RESET).insert(7 - mask, COLOR_RED)
-			 << " at 0x" << hex << addr << endl;
-	}
-	memFile.close();
-	return 0;
-}*/
-
 int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr, int timer_range) {
     this_thread::sleep_for(chrono::milliseconds(rand() % timer_range));
     cout << "Child starting injector" << endl;
@@ -136,6 +71,32 @@ long getFileLen(ifstream &file) {
     file.clear();   //  Since ignore will have set eof.
     file.seekg(0, std::ios_base::beg);
     return (long) length;
+}
+
+void execGolden(){
+    chrono::steady_clock::time_point beginTime = chrono::steady_clock::now();
+    pid_golden = fork();
+    if (pid_golden == 0) {
+        //DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
+        this_thread::sleep_for(chrono::seconds(1));
+
+        rtos(); //golden
+        exit(0);
+    }
+    waitpid(pid_golden, &status, 0);
+    //Golden time
+    gtime = chrono::duration_cast<chrono::milliseconds>(
+            chrono::steady_clock::now() - beginTime);
+    cout << endl << "Golden time : " << gtime.count() << endl;
+    ofstream time_golden("../files/Time_golden.txt");
+    if (time_golden)
+        time_golden << gtime.count();
+    else
+        cout << "Can't create Time_golden.txt";
+    time_golden.close();
+    cnt = 0;
+    const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution.txt";
+    system((const char *) cmd.c_str());
 }
 
 void menu(int& c, int& range, int& numInjection){
@@ -216,29 +177,7 @@ int main(int argc, char **argv) {
 	//If already exist a golden execution, dont start another one
 	ifstream gold("../files/Golden_execution.txt");
 	if(!gold) {
-		chrono::steady_clock::time_point bgold = chrono::steady_clock::now();
-		pid_golden = fork();
-		if (pid_golden == 0) {
-			//DO NOT REMOVE, FOR SOME REASON THE PROGRAM WONT START IF YOU REMOVE THIS
-			this_thread::sleep_for(chrono::seconds(1));
-
-			rtos(); //golden
-			return 0;
-		}
-		waitpid(pid_golden, &status, 0);
-		//Golden time
-		gtime = chrono::duration_cast<chrono::milliseconds>(
-				chrono::steady_clock::now() - bgold);
-		cout << endl << "Golden time : " << gtime.count() << endl;
-		ofstream time_golden("../files/Time_golden.txt");
-		if (time_golden)
-			time_golden << gtime.count();
-		else
-			cout << "Can't create Time_golden.txt";
-		time_golden.close();
-		cnt = 0;
-		const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution.txt";
-		system((const char *) cmd.c_str());
+        execGolden();
 	}else{
 		cout << "Found another golden execution output, skipping execution..." << endl;
 		ifstream time_golden("../files/Time_golden.txt");
@@ -252,7 +191,43 @@ int main(int argc, char **argv) {
 			cout << "Can't open Time_golden.txt";
 	}
 	gold.close();
-	for (int iter = 0; iter < numInjection; iter++) {
+
+    long addr1, addr2;
+    switch(chosen){
+        case 0:
+            addr1 = 0x431208; //DELAY!!
+            addr2 = 0x431208 + 7;
+            break;
+        case 1:
+            addr1 = 0x431af8; //uxSchedulerSuspended HANG
+            addr2 = 0x431af8 + 8;
+            break;
+        case 2:
+            addr1 = 0x431af0;//xIdleTaskHandle
+            addr2 = 0x431af0 + 176;
+            break;
+        case 3:
+            addr1 = 0x431840; //pxCurrentTCB CRASH
+            addr2 = 0x431840 + 176;
+            break;
+        case 4:
+            addr1 = 0x431860; //pxReadyTasksLists CRASH
+            addr2 = 0x431860 + 40;
+            break;
+        case 5:
+            addr1 = 0x431ae8; //xNextTaskUnblockTime HANG-SDC-CRASH
+            addr2 = 0x431ae8 + 8;
+            break;
+        case 6:
+            addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes
+            addr2 = 0x431b10;
+            break;
+        default:
+            break;
+    }
+
+
+    for (int iter = 0; iter < numInjection; iter++) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -263,42 +238,9 @@ int main(int argc, char **argv) {
 			rtos();
 			return 0;
 		}
-        long addr1, addr2;
 
         //opzione1 ->
 
-        switch(chosen){
-            case 0:
-                addr1 = 0x431208; //DELAY!!
-                addr2 = 0x431208 + 7;
-                break;
-            case 1:
-                addr1 = 0x431af8; //uxSchedulerSuspended HANG
-                addr2 = 0x431af8 + 8;
-                break;
-            case 2:
-                addr1 = 0x431af0;//xIdleTaskHandle
-                addr2 = 0x431af0 + 176;
-                break;
-            case 3:
-                addr1 = 0x431840; //pxCurrentTCB CRASH
-                addr2 = 0x431840 + 176;
-                break;
-            case 4:
-                addr1 = 0x431860; //pxReadyTasksLists CRASH
-                addr2 = 0x431860 + 40;
-                break;
-            case 5:
-                addr1 = 0x431ae8; //xNextTaskUnblockTime HANG-SDC-CRASH
-                addr2 = 0x431ae8 + 8;
-                break;
-            case 6:
-                addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes
-                addr2 = 0x431b10;
-                break;
-            default:
-                break;
-        }
 
         long inj_addr;
         thread injection(injector, pid_rtos, addr1, addr2, &inj_addr, timer_range);
