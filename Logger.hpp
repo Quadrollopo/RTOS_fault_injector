@@ -34,7 +34,6 @@ class Logger{
 private:
     list<Injection> inj;
     fstream logFile;
-    bool printed = false;
 public:
 
     Logger() = default;
@@ -58,7 +57,6 @@ public:
         }
     }
     void printInj(){
-        printed = true;
         cout << endl;
         cout << endl;
         for(const Injection& i : inj){
@@ -67,8 +65,6 @@ public:
     }
 
     virtual ~Logger() {
-        if(!printed)
-            printInj();
         if(logFile.is_open())
             logFile.close();
     }

@@ -273,24 +273,24 @@ int main(int argc, char **argv) {
                 addr2 = 0x431208 + 7;
                 break;
             case 1:
-                addr1 = 0x431720; //xStaticQueue
-                addr2 = 0x431720 + 168;
+                addr1 = 0x431af8; //uxSchedulerSuspended HANG
+                addr2 = 0x431af8 + 8;
                 break;
             case 2:
-                addr1 = 0x434380;//xTimerBuffer
-                addr2 = 0x434380 + 88;
+                addr1 = 0x431af0;//xIdleTaskHandle
+                addr2 = 0x431af0 + 176;
                 break;
             case 3:
-                addr1 = 0x4344a0; //xStack1
-                addr2 = 0x4344a0 + 200;
+                addr1 = 0x431840; //pxCurrentTCB CRASH
+                addr2 = 0x431840 + 176;
                 break;
             case 4:
-                addr1 = 0x433d40; //xStack2
-                addr2 = 0x433d40 + 200;
+                addr1 = 0x431860; //pxReadyTasksLists CRASH
+                addr2 = 0x431860 + 40;
                 break;
             case 5:
-                addr1 = 0x431ac0; //xActiveTimerList2
-                addr2 = 0x431af0;
+                addr1 = 0x431ae8; //xNextTaskUnblockTime HANG-SDC-CRASH
+                addr2 = 0x431ae8 + 8;
                 break;
             case 6:
                 addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes

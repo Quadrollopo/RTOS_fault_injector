@@ -20,7 +20,7 @@ if(UNIX)
 	#add_executable(freeRTOS "Posix_GCC/main.c" "Posix_GCC/main_andre.c" "Posix_GCC/main_blinky.c" "Posix_GCC/code_coverage_additions.c" "Posix_GCC/console.c"
 		#	"Posix_GCC/main_full.c" "Posix_GCC/run-time-stats-utils.c" "Posix_GCC/trcConfig.h" "Posix_GCC/trcSnapshotConfig.h")
 
-	add_executable(freeRTOS "${BASE}/Posix_GCC/main.c" "${BASE}/Posix_GCC/main_andre.c" "${BASE}/Posix_GCC/main_blinky.c" "${BASE}/Posix_GCC/code_coverage_additions.c" "${BASE}/Posix_GCC/console.c"
+	add_executable(freeRTOS "${BASE}/Posix_GCC/main.c" "${BASE}/Posix_GCC/main_blinky.c" "${BASE}/Posix_GCC/code_coverage_additions.c" "${BASE}/Posix_GCC/console.c"
 			"${BASE}/Posix_GCC/main_full.c" "${BASE}/Posix_GCC/run-time-stats-utils.c" "${BASE}/Posix_GCC/trcConfig.h" "${BASE}/Posix_GCC/trcSnapshotConfig.h")
 
 	target_include_directories(freeRTOS PUBLIC "${FREERTOS_DIR}/Source/include"
