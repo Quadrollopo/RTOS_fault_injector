@@ -52,22 +52,6 @@ int injector(PROCESS_INFORMATION pi, long startAddr, long endAddr, long *chosenA
     return 0;
 }
 
-BOOL WINAPI ConsoleHandler(DWORD dwType)
-{
-    cout << "helo" << endl;
-    switch(dwType) {
-        case CTRL_C_EVENT:
-            printf("ctrl-c\n");
-            break;
-        case CTRL_BREAK_EVENT:
-            printf("break\n");
-            break;
-        default:
-            printf("Some other event\n");
-    }
-    return TRUE;
-}
-
 long getFileLen(const char* file) {
     HANDLE h = CreateFile(file,                // name of the write
                        GENERIC_READ,          // open for writing
