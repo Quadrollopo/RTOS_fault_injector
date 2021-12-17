@@ -37,7 +37,6 @@ int injector(PROCESS_INFORMATION pi, long startAddr, long endAddr, long *chosenA
     ReadProcessMemory(pi.hProcess, reinterpret_cast<LPCVOID>(addr), &byte, (SIZE_T)1,
                       length_read);
 
-
     //Flipbit
     byte ^= 1 << mask;
     WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), reinterpret_cast<LPCVOID>(byte), (SIZE_T)1,

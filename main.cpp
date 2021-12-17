@@ -85,8 +85,8 @@ int injector(pid_t pid, long startAddr, long endAddr) {
 	return 0;
 }*/
 
-int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr) {
-    this_thread::sleep_for(chrono::milliseconds(rand() % 9000));
+int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr, int timer_range) {
+    this_thread::sleep_for(chrono::milliseconds(rand() % timer_range));
     cout << "Child starting injector" << endl;
     fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
     if (!memFile.is_open()) {
@@ -136,6 +136,26 @@ long getFileLen(ifstream &file) {
     file.clear();   //  Since ignore will have set eof.
     file.seekg(0, std::ios_base::beg);
     return (long) length;
+}
+
+void menu(int& c, int& range, int& numInjection){
+	cout << "Type what do you want to inject:" << endl;
+	cout << "0 - Delay" << endl;
+	cout << "1 - xStaticQueue" << endl;
+	cout << "2 - xTimerBuffer" << endl;
+	cout << "3 - xStack1" << endl;
+	cout << "4 - xStack2" << endl;
+	cout << "5 - xActiveTImerList2" << endl;
+	cout << "6 - xTimerTaskHandle" << endl;
+	do {
+		cin >> c;
+	}while(c > 6 || c < 0);
+
+	// Sta frase non ha molto senso, magari qualcosa in inglese non sarebbe male
+	cout << "Insert a range in millisecond to randomly inject:" << endl;
+	cin >> range;
+	cout << "Number of injection:" << endl;
+	cin >> numInjection;
 }
 
 int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
@@ -189,12 +209,9 @@ int main(int argc, char **argv) {
     signal(SIGINT, sigINTHandler);
 	pid_t pid_golden, pid_injector, pid_rtos;
     int status, status2;
-	int chosen;
+	int chosen, numInjection, timer_range;
 	chrono::duration<long, ratio<1, 1000>> gtime{};
-	if (argc < 2)
-		chosen = 1;
-	else
-		chosen = (int) strtol(argv[1], nullptr, 10);
+	menu(chosen, timer_range, numInjection);
 
 	//If already exist a golden execution, dont start another one
 	ifstream gold("../files/Golden_execution.txt");
@@ -235,8 +252,7 @@ int main(int argc, char **argv) {
 			cout << "Can't open Time_golden.txt";
 	}
 	gold.close();
-	int iter = 0;
-	while (iter < 4) {
+	for (int iter = 0; iter < numInjection; iter++) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
         chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -257,24 +273,24 @@ int main(int argc, char **argv) {
                 addr2 = 0x431208 + 7;
                 break;
             case 1:
-                addr1 = 0x431720; //xStaticQueue
-                addr2 = 0x431720 + 168;
+                addr1 = 0x431af8; //uxSchedulerSuspended HANG
+                addr2 = 0x431af8 + 8;
                 break;
             case 2:
-                addr1 = 0x434380;//xTimerBuffer
-                addr2 = 0x434380 + 88;
+                addr1 = 0x431af0;//xIdleTaskHandle
+                addr2 = 0x431af0 + 176;
                 break;
             case 3:
-                addr1 = 0x4344a0; //xStack1
-                addr2 = 0x4344a0 + 200;
+                addr1 = 0x431840; //pxCurrentTCB CRASH
+                addr2 = 0x431840 + 176;
                 break;
             case 4:
-                addr1 = 0x433d40; //xStack2
-                addr2 = 0x433d40 + 200;
+                addr1 = 0x431860; //pxReadyTasksLists CRASH
+                addr2 = 0x431860 + 40;
                 break;
             case 5:
-                addr1 = 0x431ac0; //xActiveTimerList2
-                addr2 = 0x431af0;
+                addr1 = 0x431ae8; //xNextTaskUnblockTime HANG-SDC-CRASH
+                addr2 = 0x431ae8 + 8;
                 break;
             case 6:
                 addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes
@@ -285,7 +301,7 @@ int main(int argc, char **argv) {
         }
 
         long inj_addr;
-        thread injection(injector, pid_rtos, addr1, addr2, &inj_addr);
+        thread injection(injector, pid_rtos, addr1, addr2, &inj_addr, timer_range);
         injection.join();
 
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
@@ -320,7 +336,6 @@ int main(int argc, char **argv) {
 
         cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
 
-		iter++;
 	}
 
     logger.printInj();

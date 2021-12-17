@@ -93,6 +93,7 @@
 /* Local includes. */
 #include "console.h"
 #include <sys/types.h>
+#include <stdlib.h>
 
 
 /* Priorities at which the tasks are created. */
@@ -343,7 +344,8 @@ static void prvQueueReceiveTask( void *pvParameters )
 			console_print( "Message received from software timer\n" );
             N++;
             if(N == 4)
-                vTaskEndScheduler();
+                exit(0);
+                //vTaskEndScheduler();
 		}
 		else
 		{
