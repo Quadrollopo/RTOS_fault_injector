@@ -17,6 +17,7 @@
 
 using namespace std;
 Logger logger;
+vector<tuple<long, string>> rtosObj = {{0x431840, "pxCurrentTCB"}, {0x431860, "pxReadyTasksLists"}, {0x431980, "xDelayedTaskList1"}, {0x4319c0, "xDelayedTaskList2"}, {0x4319e8, "pxDelayedTaskList"}, {0x431a00, "xPendingReadyList"}, {0x431a80, "xSuspendedTaskList"}, {0x431a40, "xTasksWaitingTermination"}, {0x431aa8, "uxCurrentNumberOfTasks"}, {0x431ab8, "uxTopReadyPriority"}, {0x431ab0, "xTickCount"}, {0x431ac8, "xPendedTicks"}, {0x431ad0, "xYieldPending"}, {0x431af8, "uxSchedulerSuspended"}, {0x431af0, "xIdleTaskHandle"}, {0x431ae8, "xNextTaskUnblockTime"}, {0x431ac0, "xSchedulerRunning"}, {0x431ae0, "uxTaskNumber"}, {0x431b20, "xActiveTimerList1"}, {0x431b60, "xActiveTimerList2"}, {0x431b88, "pxCurrentTimerList"}, {0x431b90, "pxOverflowTimerList"}, {0x431b98, "xTimerQueue"}, {0x431ba0, "xTimerTaskHandle"}, {0x431f20, "xResumeSignals"}, {0x431fa0, "xAllSignals"}, {0x4320a0, "hMainThread"}, {0x4320b0, "xSchedulerEnd"}, {0x432720, "xMutex"}, {0x432728, "xErrorOccurred"}, {0x432730, "xControllingIsSuspended"}, {0x432738, "xBlockingIsSuspended"}, {0x432740, "uxControllingCycles"}, {0x432748, "uxBlockingCycles"}, {0x432750, "uxPollingCycles"}, {0x432758, "xControllingTaskHandle"}};
 
 static volatile int cnt = 0;
 
@@ -73,7 +74,7 @@ long getFileLen(ifstream &file) {
 	return (long) length;
 }
 
-int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
 	ifstream golden_output("../files/Golden_execution.txt");
 	ifstream rtos_output("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
@@ -95,7 +96,7 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
 
 	if (s2 == 0) { // Crash
 		cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-		logger.addInjection(addr, elapsed, "Crash");
+		logger.addInjection(name, addr, elapsed, "Crash");
 		error = 2;
 	} else {
 		for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
@@ -108,9 +109,9 @@ int checkFiles(int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 100
 		}
 		if (!found) { //Masked
 			cout << endl << "No differences have been found" << endl;
-			logger.addInjection(addr, elapsed, "Masked");
+			logger.addInjection(name, addr, elapsed, "Masked");
 		} else
-			logger.addInjection(addr, elapsed, "SDC");
+			logger.addInjection(name, addr, elapsed, "SDC");
 	}
 	rtos_output.close();
 	golden_output.close();
@@ -147,38 +148,10 @@ void execGolden(chrono::duration<long, ratio<1, 1000>> &gtime) {
 void injectRTos(int numInjection, int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime) {
 	int status;
 	long addr1, addr2;
-	switch (chosen) {
-		case 0:
-			addr1 = 0x431208; //DELAY!!
-			addr2 = 0x431208 + 7;
-			break;
-		case 1:
-			addr1 = 0x431af8; //uxSchedulerSuspended HANG
-			addr2 = 0x431af8 + 8;
-			break;
-		case 2:
-			addr1 = 0x431af0;//xIdleTaskHandle
-			addr2 = 0x431af0 + 176;
-			break;
-		case 3:
-			addr1 = 0x431840; //pxCurrentTCB CRASH
-			addr2 = 0x431840 + 176;
-			break;
-		case 4:
-			addr1 = 0x431860; //pxReadyTasksLists CRASH
-			addr2 = 0x431860 + 40;
-			break;
-		case 5:
-			addr1 = 0x431ae8; //xNextTaskUnblockTime HANG-SDC-CRASH
-			addr2 = 0x431ae8 + 8;
-			break;
-		case 6:
-			addr1 = 0x431b00; //xTimerTaskHandle - a lot of hangs and crashes
-			addr2 = 0x431b10;
-			break;
-		default:
-			break;
-	}
+
+    addr1 = get<0>(rtosObj[chosen]);
+    addr2 = addr1 + 8;
+    string name = get<1>(rtosObj[chosen]);
 	for (int iter = 0; iter < numInjection; iter++) {
 		cout << endl << "Itering injections, iteration : " << iter << endl;
 		chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -209,7 +182,7 @@ void injectRTos(int numInjection, int chosen, int timer_range, chrono::duration<
 			cout << endl << "Timeout expired, killing process " << endl;
 			kill(pid_rtos, SIGKILL);
 
-			logger.addInjection(inj_addr, elapsed, "Hang");
+			logger.addInjection(name, inj_addr, elapsed, "Hang");
 		} else if (cnt > 0) {
 			cnt = 0;
 		}
@@ -222,12 +195,12 @@ void injectRTos(int numInjection, int chosen, int timer_range, chrono::duration<
 
 		int err = 0;
 		if (hang != 0)
-			err = checkFiles(pid_rtos, inj_addr, elapsed);
+			err = checkFiles(name, pid_rtos, inj_addr, elapsed);
 
 		long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
 
 		if (abs(timeDifference) > 800 && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
-			logger.addInjection(inj_addr, elapsed, "Delay");
+			logger.addInjection(name, inj_addr, elapsed, "Delay");
 
 		cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
 
@@ -237,16 +210,11 @@ void injectRTos(int numInjection, int chosen, int timer_range, chrono::duration<
 
 void menu(int &c, int &range, int &numInjection) {
 	cout << "Type what do you want to inject:" << endl;
-	cout << "0 - Delay" << endl;
-	cout << "1 - xStaticQueue" << endl;
-	cout << "2 - xTimerBuffer" << endl;
-	cout << "3 - xStack1" << endl;
-	cout << "4 - xStack2" << endl;
-	cout << "5 - xActiveTImerList2" << endl;
-	cout << "6 - xTimerTaskHandle" << endl;
+    for(int i = 0; i < rtosObj.size(); i++)
+        cout << i << " - " << get<1>(rtosObj[i]) << endl;
 	do {
 		cin >> c;
-	}while(c > 6 || c < 0);
+	}while(c >= rtosObj.size() || c < 0);
 
 	// Sta frase non ha molto senso, magari qualcosa in inglese non sarebbe male
 	cout << "Insert a range in millisecond to randomly inject:" << endl;
