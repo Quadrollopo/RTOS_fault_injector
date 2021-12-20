@@ -35,9 +35,13 @@ int injector(pid_t pid, const Target& t, long *chosenAddr, int timer_range) {
     uniform_int_distribution<long> address_distribution;
     if(!t.isPointer())
         address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
-    else //TODO: read pointer value
-        address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
-
+    else {
+        memFile.seekg(t.getAddress());
+        uint8_t h[4];
+        memFile.read(reinterpret_cast<char *>(h), 4);
+        long heapAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        address_distribution = uniform_int_distribution<long>(heapAddress, heapAddress + t.getSize());
+    }
     long addr = address_distribution(generator);
     memFile.seekg(addr);
     byte = memFile.peek();
