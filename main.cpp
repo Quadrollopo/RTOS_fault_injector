@@ -19,6 +19,8 @@ using namespace std;
 Logger logger;
 vector<tuple<long, string>> rtosObj = {{0x431840, "pxCurrentTCB"}, {0x431860, "pxReadyTasksLists"}, {0x431980, "xDelayedTaskList1"}, {0x4319c0, "xDelayedTaskList2"}, {0x4319e8, "pxDelayedTaskList"}, {0x431a00, "xPendingReadyList"}, {0x431a80, "xSuspendedTaskList"}, {0x431a40, "xTasksWaitingTermination"}, {0x431aa8, "uxCurrentNumberOfTasks"}, {0x431ab8, "uxTopReadyPriority"}, {0x431ab0, "xTickCount"}, {0x431ac8, "xPendedTicks"}, {0x431ad0, "xYieldPending"}, {0x431af8, "uxSchedulerSuspended"}, {0x431af0, "xIdleTaskHandle"}, {0x431ae8, "xNextTaskUnblockTime"}, {0x431ac0, "xSchedulerRunning"}, {0x431ae0, "uxTaskNumber"}, {0x431b20, "xActiveTimerList1"}, {0x431b60, "xActiveTimerList2"}, {0x431b88, "pxCurrentTimerList"}, {0x431b90, "pxOverflowTimerList"}, {0x431b98, "xTimerQueue"}, {0x431ba0, "xTimerTaskHandle"}, {0x431f20, "xResumeSignals"}, {0x431fa0, "xAllSignals"}, {0x4320a0, "hMainThread"}, {0x4320b0, "xSchedulerEnd"}, {0x432720, "xMutex"}, {0x432728, "xErrorOccurred"}, {0x432730, "xControllingIsSuspended"}, {0x432738, "xBlockingIsSuspended"}, {0x432740, "uxControllingCycles"}, {0x432748, "uxBlockingCycles"}, {0x432750, "uxPollingCycles"}, {0x432758, "xControllingTaskHandle"}};
 
+vector<Target> objects = {{"xActiveTimerList2", 0x431b60, 40, false}, {"xActiveTimerList1", 0x431b20, 40, false}, {"uxBlockingCycles", 0x432748, 8, false}, {"uxPollingCycles", 0x432750, 8, false}, {"uxControllingCycles", 0x432740, 8, false}, {"xBlockingIsSuspended", 0x432738, 8, false}, {"xControllingIsSuspended", 0x432730, 8, false}, {"xErrorOccurred", 0x432728, 8, false}, {"xSchedulerEnd", 0x4320b0, 8, false}, {"hMainThread", 0x4320a0, 8, false}, {"xAllSignals", 0x431fa0, 128, false}, {"xResumeSignals", 0x431f20, 128, false}, {"pxReadyTasksLists", 0x431860, 280, false}, {"xDelayedTaskList1", 0x431980, 40, false}, {"xDelayedTaskList2", 0x4319c0, 40, false}, {"xPendingReadyList", 0x431a00, 40, false}, {"xSuspendedTaskList", 0x431a80, 40, false}, {"xTasksWaitingTermination", 0x431a40, 40, false}, {"uxCurrentNumberOfTasks", 0x431aa8, 8, false}, {"uxTopReadyPriority", 0x431ab8, 8, false}, {"xTickCount", 0x431ab0, 8, false}, {"xPendedTicks", 0x431ac8, 8, false}, {"xYieldPending", 0x431ad0, 8, false}, {"uxSchedulerSuspended", 0x431af8, 8, false}, {"xNextTaskUnblockTime", 0x431ae8, 8, false}, {"xSchedulerRunning", 0x431ac0, 8, false}, {"uxTaskNumber", 0x431ae0, 8, false}, {"xTimerTaskHandle", 0x431ba0, 176, true}, {"xTimerQueue", 0x431b98, 168, true}, {"pxOverflowTimerList", 0x431b90, 40, true}, {"pxCurrentTimerList", 0x431b88, 40, true}, {"xBlockingTaskHandle", 0x432760, 176, true}, {"xControllingTaskHandle", 0x432758, 176, true}, {"xMutex", 0x432720, 168, true}, {"pxCurrentTCB", 0x431840, 176, true}, {"pxDelayedTaskList", 0x4319e8, 40, true}, {"xIdleTaskHandle", 0x431af0, 176, true}};
+
 static volatile int cnt = 0;
 
 int injector(pid_t pid, long startAddr, long endAddr, long *chosenAddr, int timer_range) {
@@ -99,14 +101,18 @@ int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std:
 		logger.addInjection(name, addr, elapsed, "Crash");
 		error = 2;
 	} else {
-		for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
-			if (g_line != f_line) {
-				found = true;
-				error = 1;
-				cout << "The output should be" << endl << g_line << endl
-					 << "instead I found" << endl << f_line << endl;
-			}
-		}
+        if(s1 == s2) {
+            for (string g_line, f_line; getline(golden_output, g_line), getline(rtos_output, f_line);) {
+                if (g_line != f_line) {
+                    found = true;
+                    error = 1;
+                    cout << "The output should be" << endl << g_line << endl
+                         << "instead I found" << endl << f_line << endl;
+                }
+            }
+        }
+        else
+            found = true;
 		if (!found) { //Masked
 			cout << endl << "No differences have been found" << endl;
 			logger.addInjection(name, addr, elapsed, "Masked");

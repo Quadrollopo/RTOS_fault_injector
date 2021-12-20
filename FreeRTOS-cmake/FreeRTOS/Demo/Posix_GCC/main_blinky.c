@@ -268,7 +268,7 @@ char line[50] = {0};
 	for( ;; )
 	{
         res = fgets(line, 50, fR);
-        if(res == NULL) break;
+        if(res == NULL) vTaskEndScheduler(); //file ended
         msg[1] = line;
         console_print("Row read from file Vero_Dante\n");
 		/* Place this task in the blocked state until it is time to run again.
@@ -343,9 +343,9 @@ static void prvQueueReceiveTask( void *pvParameters )
             fprintf(fW, "%s", ulReceivedValue[1]);
 			console_print( "Message received from software timer\n" );
             N++;
-            if(N == 4)
-                exit(0);
-                //vTaskEndScheduler();
+            if(N == 4) {
+                vTaskEndScheduler();
+            }
 		}
 		else
 		{

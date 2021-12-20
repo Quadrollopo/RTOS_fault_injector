@@ -10,8 +10,9 @@ private:
     string name;
     long address;
     int size;
+    bool pointer;
 public:
-    Target(string name, long address, int size) : name(std::move(name)), address(address), size(size) {}
+    Target(string name, long address, int size, bool pointer=false) : name(std::move(name)), address(address), size(size), pointer(pointer){};
 
     string getName() const {
         return name;
