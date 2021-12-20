@@ -26,4 +26,8 @@ public:
         return size;
     }
 
+    bool isPointer() const{
+        return pointer;
+    }
+
 };
