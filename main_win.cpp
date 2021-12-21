@@ -25,10 +25,11 @@ static volatile int cnt = 0;
 using namespace std;
 
 int injector(PROCESS_INFORMATION pi, const Target &t, long *chosenAddr, int timer_range) {
-    rand();
-    this_thread::sleep_for(chrono::milliseconds(rand() % timer_range));
-    cout << "Child starting injector" << endl;
     random_device generator;
+    uniform_int_distribution<int> time_dist(0, timer_range);
+    this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
+    cout << "Child starting injector" << endl;
+
     uniform_int_distribution<int> bit_distribution(0, 7);
     uint8_t byte, mask = bit_distribution(generator);
     uniform_int_distribution<long> address_distribution;
@@ -251,8 +252,6 @@ void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> 
 }
 
 int main(int argc, char **argv) {
-    long time = chrono::steady_clock::now().time_since_epoch().count();
-    srand(time);
     int status, status2;
     int chosen, numInjection, timer_range;
     STARTUPINFO si;
