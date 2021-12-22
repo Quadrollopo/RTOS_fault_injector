@@ -157,64 +157,61 @@ void execGolden(chrono::duration<long, ratio<1, 1000>> &gtime) {
 	system((const char *) cmd.c_str());
 }
 
-void injectRTos(int numInjection, int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime) {
+void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime, int iter) {
 	int status;
 	long addr1, addr2;
-    string name = objects[chosen].getName();
+	string name = objects[chosen].getName();
 
-	for (int iter = 0; iter < numInjection; iter++) {
-		cout << endl << "Itering injections, iteration : " << iter << endl;
-		chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	cout << endl << "Itering injections, iteration : " << iter << endl;
+	chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-		pid_t pid_rtos = fork();
-		if (pid_rtos == 0) {
-			cout << "freeRTOS iter : " << iter << endl;
-			this_thread::sleep_for(chrono::milliseconds(300));
-			rtos();
-			exit(0);
-		}
-
-		//opzione1 ->
-
-
-		long inj_addr;
-		thread injection(injector, pid_rtos, objects[chosen], &inj_addr, timer_range);
-		injection.join();
-
-		chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(
-				chrono::steady_clock::now() - begin);
-
-		//hang handling
-		struct timeval timeout = {40, 0};
-		int hang;
-		hang = select(0, nullptr, nullptr, nullptr, &timeout);
-		if (hang == 0) { //HANG
-			cout << endl << "Timeout expired, killing process " << endl;
-			kill(pid_rtos, SIGKILL);
-
-			logger.addInjection(name, inj_addr, elapsed, "Hang");
-		} else if (cnt > 0) {
-			cnt = 0;
-		}
-		waitpid(pid_rtos, &status, 0);
-		chrono::steady_clock::time_point end = chrono::steady_clock::now();
-
-		chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(
-				end - begin);
-		cout << endl << "RTOS iter time : " << rtime.count() << endl;
-
-		int err = 0;
-		if (hang != 0)
-			err = checkFiles(name, pid_rtos, inj_addr, elapsed);
-
-		long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
-
-		if (abs(timeDifference) > 800 && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
-			logger.addInjection(name, inj_addr, elapsed, "Delay");
-
-		cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
-
+	pid_t pid_rtos = fork();
+	if (pid_rtos == 0) {
+		cout << "freeRTOS iter : " << iter << endl;
+		this_thread::sleep_for(chrono::milliseconds(300));
+		rtos();
+		exit(0);
 	}
+
+	//opzione1 ->
+
+
+	long inj_addr;
+	injector(pid_rtos, objects[chosen], &inj_addr, timer_range);
+
+	chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(
+			chrono::steady_clock::now() - begin);
+
+	//hang handling
+	struct timeval timeout = {40, 0};
+	int hang;
+	hang = select(0, nullptr, nullptr, nullptr, &timeout);
+	if (hang == 0) { //HANG
+		cout << endl << "Timeout expired, killing process " << endl;
+		kill(pid_rtos, SIGKILL);
+
+		logger.addInjection(name, inj_addr, elapsed, "Hang");
+	} else if (cnt > 0) {
+		cnt = 0;
+	}
+	waitpid(pid_rtos, &status, 0);
+	chrono::steady_clock::time_point end = chrono::steady_clock::now();
+
+	chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(
+			end - begin);
+	cout << endl << "RTOS iter time : " << rtime.count() << endl;
+
+	int err = 0;
+	if (hang != 0)
+		err = checkFiles(name, pid_rtos, inj_addr, elapsed);
+
+	long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
+
+	if (abs(timeDifference) > 800 && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
+		logger.addInjection(name, inj_addr, elapsed, "Delay");
+
+	cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
+
 
 }
 
@@ -259,11 +256,14 @@ int main(int argc, char **argv) {
 		}
 	}
 	gold.close();
-
-
-	injectRTos(numInjection, chosen, timer_range, gtime);
-
-    logger.printInj();
+	thread p[numInjection];
+	for (int iter = 0; iter < numInjection; iter++) {
+		p[iter] = thread(injectRTos, chosen, timer_range, gtime, iter);
+	}
+	for (int i = 0; i < numInjection; i++) {
+		p[i].join();
+	}
+	logger.printInj();
 
 	return 0;
 }
