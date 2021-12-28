@@ -15,6 +15,9 @@
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
+#define PARALLELIZATION 0
+#define PRINT_ON_FILE 1
+
 using namespace std;
 Logger logger;
 vector<Target> objects = {{"xActiveTimerList2", 0x431b60, 40, false}, {"xActiveTimerList1", 0x431b20, 40, false}, {"uxBlockingCycles", 0x432748, 8, false}, {"uxPollingCycles", 0x432750, 8, false}, {"uxControllingCycles", 0x432740, 8, false}, {"xBlockingIsSuspended", 0x432738, 8, false}, {"xControllingIsSuspended", 0x432730, 8, false}, {"xErrorOccurred", 0x432728, 8, false}, {"xSchedulerEnd", 0x4320b0, 8, false}, {"hMainThread", 0x4320a0, 8, false}, {"xAllSignals", 0x431fa0, 128, false}, {"xResumeSignals", 0x431f20, 128, false}, {"pxReadyTasksLists", 0x431860, 280, false}, {"xDelayedTaskList1", 0x431980, 40, false}, {"xDelayedTaskList2", 0x4319c0, 40, false}, {"xPendingReadyList", 0x431a00, 40, false}, {"xSuspendedTaskList", 0x431a80, 40, false}, {"xTasksWaitingTermination", 0x431a40, 40, false}, {"uxCurrentNumberOfTasks", 0x431aa8, 8, false}, {"uxTopReadyPriority", 0x431ab8, 8, false}, {"xTickCount", 0x431ab0, 8, false}, {"xPendedTicks", 0x431ac8, 8, false}, {"xYieldPending", 0x431ad0, 8, false}, {"uxSchedulerSuspended", 0x431af8, 8, false}, {"xNextTaskUnblockTime", 0x431ae8, 8, false}, {"xSchedulerRunning", 0x431ac0, 8, false}, {"uxTaskNumber", 0x431ae0, 8, false}, {"xTimerTaskHandle", 0x431ba0, 176, true}, {"xTimerQueue", 0x431b98, 168, true}, {"pxOverflowTimerList", 0x431b90, 40, true}, {"pxCurrentTimerList", 0x431b88, 40, true}, {"xBlockingTaskHandle", 0x432760, 176, true}, {"xControllingTaskHandle", 0x432758, 176, true}, {"xMutex", 0x432720, 168, true}, {"pxCurrentTCB", 0x431840, 176, true}, {"pxDelayedTaskList", 0x4319e8, 40, true}, {"xIdleTaskHandle", 0x431af0, 176, true}};
@@ -256,14 +259,23 @@ int main(int argc, char **argv) {
 		}
 	}
 	gold.close();
-	thread p[numInjection];
+#if PARALLELIZATION
+	vector<thread> p(numInjection);
 	for (int iter = 0; iter < numInjection; iter++) {
 		p[iter] = thread(injectRTos, chosen, timer_range, gtime, iter);
 	}
 	for (int i = 0; i < numInjection; i++) {
 		p[i].join();
 	}
-	logger.printInj();
+#else
+    for (int iter = 0; iter < numInjection; iter++)
+        injectRTos(chosen, timer_range, gtime, iter);
+#endif
 
+#if PRINT_ON_FILE
+    logger.logOnfile(getpid());
+#else
+    logger.printInj();
+#endif
 	return 0;
 }
