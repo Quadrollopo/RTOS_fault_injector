@@ -333,7 +333,7 @@ static void prvQueueReceiveTask( void *pvParameters )
 		if( !strcmp(ulReceivedValue[0], "Task") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
-#ifndef PARALLEL
+#if !PARALLEL
 			console_print( "Message write on file Falso_Dante\n");
 #endif
             //console_print(string1);
@@ -344,7 +344,7 @@ static void prvQueueReceiveTask( void *pvParameters )
 		else if( !strcmp(ulReceivedValue[0], "Timer") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
-#ifndef PARALLEL
+#if !PARALLEL
 			console_print( "Message received from software timer\n" );
 #endif
             N++;
