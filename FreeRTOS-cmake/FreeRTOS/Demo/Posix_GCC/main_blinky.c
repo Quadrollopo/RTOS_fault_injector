@@ -113,6 +113,7 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
+#define PARALLEL 0
 /*-----------------------------------------------------------*/
 
 /*
@@ -332,7 +333,9 @@ static void prvQueueReceiveTask( void *pvParameters )
 		if( !strcmp(ulReceivedValue[0], "Task") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
+#ifndef PARALLEL
 			console_print( "Message write on file Falso_Dante\n");
+#endif
             //console_print(string1);
             //console_print(string2);
             //console_print(string3);
@@ -341,7 +344,9 @@ static void prvQueueReceiveTask( void *pvParameters )
 		else if( !strcmp(ulReceivedValue[0], "Timer") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
+#ifndef PARALLEL
 			console_print( "Message received from software timer\n" );
+#endif
             N++;
             if(N == 3) {
                 vTaskEndScheduler();
