@@ -37,23 +37,24 @@ int injector(PROCESS_INFORMATION pi, const Target &t, long *chosenAddr, int time
     if(!t.isPointer())
         address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
     else {
-        SIZE_T* length_read = nullptr;
+        SIZE_T length_read = 0;
         uint8_t h[4];
-        ReadProcessMemory(pi.hProcess, reinterpret_cast<LPCVOID>(t.getAddress()), &h, (SIZE_T)4,
-                          length_read);
+        ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), h, (size_t)4,
+                          &length_read);
+        if(length_read == 0)
+            cerr<<"Houston we have a problem..." <<endl;
         long heapAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         address_distribution = uniform_int_distribution<long>(heapAddress, heapAddress + t.getSize());
     }
 
     long addr = address_distribution(generator);
-    SIZE_T* length_read = nullptr;
-    ReadProcessMemory(pi.hProcess, reinterpret_cast<LPCVOID>(addr), &byte, (SIZE_T)1,
-                      length_read);
-
+    SIZE_T length_read = 0;
+    ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), &byte, (SIZE_T)1,
+                      &length_read);
     //Flipbit
     byte ^= 1 << mask;
-    WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), reinterpret_cast<LPCVOID>(byte), (SIZE_T)1,
-                       reinterpret_cast<SIZE_T *>(length_read));
+    WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), (LPCVOID)byte, (SIZE_T)1,
+                       &length_read);
 
     cout << "Modified " <<
          // put red color for the bit flipped
@@ -66,12 +67,19 @@ int injector(PROCESS_INFORMATION pi, const Target &t, long *chosenAddr, int time
 
 long getFileLen(const char* file) {
     HANDLE h = CreateFile(file,                // name of the write
-                       GENERIC_READ,          // open for writing
-                       0,                      // do not share
+                       GENERIC_READ,          // open for reading
+                       1,                      // do not share
                        NULL,                   // default security
                        OPEN_EXISTING,             //
                        FILE_ATTRIBUTE_NORMAL,  // normal file
                        NULL);                  // no attr. template
+    if(h == INVALID_HANDLE_VALUE)
+    {
+        printf("hFile is NULL\n");
+        printf("Could not open golden\n");
+// return error
+        return 4;
+    }
     long len = (long) GetFileSize( h, NULL);
     return len;
 }
@@ -197,7 +205,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer
 
         long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
 
-        if(abs(timeDifference) > 800 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
+        if(abs(timeDifference) > 1100 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
             logger.addInjection(name, inj_addr, elapsed, "Delay");
 
         cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
