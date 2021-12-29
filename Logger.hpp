@@ -36,7 +36,7 @@ public:
     }
     void logOnfile(int pid){
         logFile.open("../logs/logFile.txt"  /*+ to_string(pid) +*/ ".txt", ios::app);
-        std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         if(!logFile)
             logFile.open("../logs/logFile.txt" /* + to_string(pid) +*/  ".txt", ios::in | ios::out);
         string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + "---\n--------------------------\n";

@@ -18,13 +18,14 @@
 
 using namespace std;
 Logger logger;
-vector<Target> objects = {{"xActiveTimerList2", 0x00961c1c, 40, false}, {"xActiveTimerList1", 0x00961c08, 40, false}, {"uxBlockingCycles", 0x00961260, 8, false}, {"uxPollingCycles", 0x00961264, 8, false}, {"uxControllingCycles", 0x0096125c, 8, false}, {"xBlockingIsSuspended", 0x00961258, 8, false}, {"xControllingIsSuspended", 0x00961254, 8, false}, {"xErrorOccurred", 0x0096154c, 8, false}, {"pxReadyTasksLists", 0x00961aa8, 280, false}, {"xDelayedTaskList1", 0x00961a94, 40, false}, {"xDelayedTaskList2", 0x00961b34, 40, false}, {"xPendingReadyList", 0x00961b50, 40, false}, {"xSuspendedTaskList", 0x00961b7c, 40, false}, {"xTasksWaitingTermination", 0x00961b64, 40, false}, {"uxCurrentNumberOfTasks", 0x00961b90, 8, false}, {"uxTopReadyPriority", 0x00961b98, 8, false}, {"xTickCount", 0x00961b94, 8, false}, {"xPendedTicks", 0x00961ba0, 8, false}, {"xYieldPending", 0x00961ba4, 8, false}, {"uxSchedulerSuspended", 0x00961bb8, 8, false}, {"xNextTaskUnblockTime", 0x00961bb0, 8, false}, {"xSchedulerRunning", 0x00961b9c, 8, false}, {"uxTaskNumber", 0x00961bac, 8, false}, {"xTimerTaskHandle", 0x00961c3c, 176, true}, {"xTimerQueue", 0x00961c38, 168, true}, {"pxOverflowTimerList", 0x00961c34, 40, true}, {"pxCurrentTimerList", 0x00961c30, 40, true}, {"xBlockingTaskHandle", 0x0096126c, 176, true}, {"xControllingTaskHandle", 0x00961268, 176, true}, {"xMutex", 0x0096124c, 168, true}, {"pxCurrentTCB", 0x00961a90, 176, true}, {"pxDelayedTaskList", 0x00961b48, 40, true}, {"xIdleTaskHandle", 0x00961bb4, 176, true}};
+//TODO: addresses need to be updated, only the 16th (xTickCount) is correct
+vector<Target> objects = {{"xActiveTimerList2", 0x00961c1c, 40, false}, {"xActiveTimerList1", 0x00961c08, 40, false}, {"uxBlockingCycles", 0x00961260, 8, false}, {"uxPollingCycles", 0x00961264, 8, false}, {"uxControllingCycles", 0x0096125c, 8, false}, {"xBlockingIsSuspended", 0x00961258, 8, false}, {"xControllingIsSuspended", 0x00961254, 8, false}, {"xErrorOccurred", 0x0096154c, 8, false}, {"pxReadyTasksLists", 0x00961aa8, 280, false}, {"xDelayedTaskList1", 0x00961a94, 40, false}, {"xDelayedTaskList2", 0x00961b34, 40, false}, {"xPendingReadyList", 0x00961b50, 40, false}, {"xSuspendedTaskList", 0x00961b7c, 40, false}, {"xTasksWaitingTermination", 0x00961b64, 40, false}, {"uxCurrentNumberOfTasks", 0x00961b90, 8, false}, {"uxTopReadyPriority", 0x00961b98, 8, false}, {"xTickCount", 0x001b1b94, 8, false}, {"xPendedTicks", 0x00961ba0, 8, false}, {"xYieldPending", 0x00961ba4, 8, false}, {"uxSchedulerSuspended", 0x00961bb8, 8, false}, {"xNextTaskUnblockTime", 0x00961bb0, 8, false}, {"xSchedulerRunning", 0x00961b9c, 8, false}, {"uxTaskNumber", 0x00961bac, 8, false}, {"xTimerTaskHandle", 0x00961c3c, 176, true}, {"xTimerQueue", 0x00961c38, 168, true}, {"pxOverflowTimerList", 0x00961c34, 40, true}, {"pxCurrentTimerList", 0x00961c30, 40, true}, {"xBlockingTaskHandle", 0x0096126c, 176, true}, {"xControllingTaskHandle", 0x00961268, 176, true}, {"xMutex", 0x0096124c, 168, true}, {"pxCurrentTCB", 0x00961a90, 176, true}, {"pxDelayedTaskList", 0x00961b48, 40, true}, {"xIdleTaskHandle", 0x00961bb4, 176, true}};
 
 static volatile int cnt = 0;
 
 using namespace std;
 
-int injector(PROCESS_INFORMATION pi, const Target &t, long *chosenAddr, int timer_range) {
+int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int timer_range) {
     random_device generator;
     uniform_int_distribution<int> time_dist(0, timer_range);
     this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
@@ -47,14 +48,26 @@ int injector(PROCESS_INFORMATION pi, const Target &t, long *chosenAddr, int time
         address_distribution = uniform_int_distribution<long>(heapAddress, heapAddress + t.getSize());
     }
 
-    long addr = address_distribution(generator);
+    DWORD addr = address_distribution(generator);
     SIZE_T length_read = 0;
-    ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), &byte, (SIZE_T)1,
-                      &length_read);
+    int err = 0;
+    if(!ReadProcessMemory(pi.hProcess, (LPVOID)(addr), &byte, (SIZE_T)1,
+                      &length_read)) {
+        err = GetLastError();
+        cout << err;
+    }
+
     //Flipbit
     byte ^= 1 << mask;
-    WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), (LPCVOID)byte, (SIZE_T)1,
-                       &length_read);
+    DWORD oldprotect;
+
+    //VirtualProtectEx(pi.hProcess, (LPVOID)addr, 1, PAGE_EXECUTE_READWRITE, &oldprotect);
+    if(!WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), (LPVOID)&byte, (SIZE_T)1,
+                       &length_read)){
+        err = GetLastError();
+        cout << err;
+    }
+    //VirtualProtectEx(pi.hProcess, (LPVOID)addr, 1, oldprotect, &oldprotect);
 
     cout << "Modified " <<
          // put red color for the bit flipped
