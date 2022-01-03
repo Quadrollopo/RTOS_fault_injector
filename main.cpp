@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <bitset>
 #include <random>
@@ -10,13 +9,12 @@
 #include <cstdlib>
 #include <limits>
 #include "Logger.hpp"
-#include <tuple>
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
 #define PARALLELIZATION 0
-#define PRINT_ON_FILE 1
+#define PRINT_ON_FILE 0
 
 using namespace std;
 Logger logger;
@@ -72,7 +70,11 @@ void sigCHLDHandler(int){
 }
 
 void sigINTHandler(int){
-    logger.printInj();
+#if PRINT_ON_FILE
+        logger.logOnfile();
+#else
+        logger.printInj();
+#endif
     exit(0);
 }
 
@@ -84,7 +86,7 @@ long getFileLen(ifstream &file) {
 	return (long) length;
 }
 
-int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
 	ifstream golden_output("../files/Golden_execution.txt");
 	ifstream rtos_output("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
 	bool found = false;
@@ -175,9 +177,6 @@ void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 100
 		exit(0);
 	}
 
-	//opzione1 ->
-
-
 	long inj_addr;
 	injector(pid_rtos, objects[chosen], &inj_addr, timer_range);
 
@@ -208,8 +207,9 @@ void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 100
 		err = checkFiles(name, pid_rtos, inj_addr, elapsed);
 
 	long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
+    bool delay = abs(timeDifference) > 750 || abs(timeDifference) < 650;
 
-	if (abs(timeDifference) > 800 && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
+	if (delay && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
 		logger.addInjection(name, inj_addr, elapsed, "Delay");
 
 	cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
@@ -233,9 +233,10 @@ void menu(int &c, int &range, int &numInjection) {
 }
 
 
-int main(int argc, char **argv) {
+int main() {
     signal(SIGCHLD, sigCHLDHandler);
     signal(SIGINT, sigINTHandler);
+    srand(std::chrono::system_clock::now().time_since_epoch().count());
 	int chosen, numInjection, timer_range;
 	chrono::duration<long, ratio<1, 1000>> gtime{};
 	menu(chosen, timer_range, numInjection);
@@ -272,7 +273,7 @@ int main(int argc, char **argv) {
 #endif
 
 #if PRINT_ON_FILE
-    logger.logOnfile(getpid());
+    logger.logOnfile();
 #else
     logger.printInj();
 #endif

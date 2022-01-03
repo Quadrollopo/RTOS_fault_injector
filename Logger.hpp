@@ -34,12 +34,12 @@ public:
         i = new Injection(elapsed, std::move(faultType), std::move(*t));
         inj.push_back(*i);
     }
-    void logOnfile(int pid){
-        logFile.open("../logs/logFile.txt"  /*+ to_string(pid) +*/ ".txt", ios::app);
+    void logOnfile(){
+        logFile.open("../logs/logFile.txt", ios::app);
         time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         if(!logFile)
-            logFile.open("../logs/logFile.txt" /* + to_string(pid) +*/  ".txt", ios::in | ios::out);
-        string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + "---\n--------------------------\n";
+            logFile.open("../logs/logFile.txt", ios::in | ios::out);
+        string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + " ---\n--------------------------\n";
         logFile.write(init_str.c_str(), init_str.size());
         for(const Injection& i : inj){
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
@@ -48,9 +48,12 @@ public:
     }
     void printInj(){
         cout << endl;
-        cout << endl;
+        time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + " ---\n--------------------------\n";
+        cout << init_str;
         for(const Injection& i : inj){
-            cout << "Address : 0x" << hex << i.object.getAddress() << " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType << " --- Injected Object : " + i.object.getName() + "\n";
+            string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
+            cout << s_inj;
         }
     }
 
