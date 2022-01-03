@@ -1,0 +1,32 @@
+b main_blinky
+r
+
+set pagination off
+set logging file gdb.output
+set logging on
+
+set $ipx = 0
+set $end = 27
+
+set $vars = {&xActiveTimerList2, &xActiveTimerList1, &uxBlockingCycles, &uxPollingCycles, &uxControllingCycles, &xBlockingIsSuspended, &xControllingIsSuspended, &xErrorOccurred, &xSchedulerEnd, &hMainThread, &xAllSignals, &xResumeSignals, &pxReadyTasksLists, &xDelayedTaskList1, &xDelayedTaskList2, &xPendingReadyList, &xSuspendedTaskList, &xTasksWaitingTermination, &uxCurrentNumberOfTasks, &uxTopReadyPriority, &xTickCount, &xPendedTicks, &xYieldPending, &uxSchedulerSuspended, &xNextTaskUnblockTime, &xSchedulerRunning, &uxTaskNumber}
+set $pointers = {&xTimerTaskHandle, &xTimerQueue, &pxOverflowTimerList, &pxCurrentTimerList, &xBlockingTaskHandle, &xControllingTaskHandle, &xMutex, &pxCurrentTCB, &pxDelayedTaskList, &xIdleTaskHandle, &xQueue, &xTimer}
+
+#bug --> sizes are not printed correctly
+
+while ($ipx < 27)
+	x $vars[$ipx]
+	p sizeof *$vars[$ipx]
+	set $ipx=$ipx+1
+end
+
+set $ipx = 0
+set $end = 10
+
+while ($ipx < 12)
+    x $pointers[$ipx]
+    p sizeof **$pointers[$ipx]
+    set $ipx=$ipx+1
+end
+
+set logging off
+quit
