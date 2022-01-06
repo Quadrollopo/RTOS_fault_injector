@@ -40,11 +40,12 @@ public:
         if(!logFile)
             logFile.open("../logs/logFile.txt", ios::in | ios::out);
         string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + " ---\n--------------------------\n";
-        logFile.write(init_str.c_str(), init_str.size());
+        logFile.write(init_str.c_str(), (long) init_str.size());
         for(const Injection& i : inj){
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
             logFile.write(s_inj.c_str(), (int) s_inj.length());
         }
+        logFile.close();
     }
     void printInj(){
         cout << endl;
