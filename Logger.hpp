@@ -5,6 +5,9 @@
 #include <list>
 #include <utility>
 #include "Target.hpp"
+#include <mutex>
+
+#define PARALLELIZATION 1
 
 using namespace std;
 
@@ -22,6 +25,9 @@ class Logger{
 private:
     list<Injection> inj;
     fstream logFile;
+#if PARALLELIZATION
+    mutex m;
+#endif
 public:
 
     Logger() = default;
@@ -32,6 +38,9 @@ public:
         t = new Target(std::move(name), addr, 0);
 
         i = new Injection(elapsed, std::move(faultType), std::move(*t));
+#if PARALLELIZATION
+        lock_guard<mutex> lock(m);
+#endif
         inj.push_back(*i);
     }
     void logOnfile(){

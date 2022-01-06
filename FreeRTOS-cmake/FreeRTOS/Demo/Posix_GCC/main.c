@@ -65,7 +65,6 @@
 
 #define    BLINKY_DEMO       0
 #define    FULL_DEMO         1
-#define    ANDRE_DEMO        2
 
 #define mainSELECTED_APPLICATION BLINKY_DEMO
 
@@ -131,8 +130,10 @@ int main( void )
 
         /* Start the trace recording - the recording is written to a file if
         configASSERT() is called. */
+    #if !PARALLEL
         printf( "\r\nTrace started.\r\nThe trace will be dumped to disk if a call to configASSERT() fails.\r\n" );
         printf( "\r\nThe trace will be dumped to disk if Enter is hit.\r\n" );
+    #endif
         uiTraceStart();
     }
     #endif

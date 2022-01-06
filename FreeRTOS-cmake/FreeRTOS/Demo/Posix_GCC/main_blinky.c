@@ -113,7 +113,6 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
-#define PARALLEL 0
 /*-----------------------------------------------------------*/
 
 /*
@@ -153,7 +152,6 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
     int pid = getpid();
     snprintf(falso, 32, "../files/Falso_Dante_%d.txt", pid);
 
-    console_print(falso);
     if( xQueue != NULL )
 	{
         fR = fopen("../Vero_Dante.txt", "r");
@@ -229,8 +227,10 @@ char line[50] = {0};
         res = fgets(line, 50, fR);
         if(res == NULL) vTaskEndScheduler(); //file ended
         msg[1] = line;
+#if !PARALLEL
         console_print("Row read from file Vero_Dante\n");
-		/* Place this task in the blocked state until it is time to run again.
+#endif
+        /* Place this task in the blocked state until it is time to run again.
 		The block time is specified in ticks, pdMS_TO_TICKS() was used to
 		convert a time specified in milliseconds into a time specified in ticks.
 		While in the Blocked state this task will not consume any CPU time. */

@@ -13,7 +13,6 @@
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
-#define PARALLELIZATION 0
 #define PRINT_ON_FILE 1
 
 using namespace std;
