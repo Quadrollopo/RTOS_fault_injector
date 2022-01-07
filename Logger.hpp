@@ -7,6 +7,12 @@
 #include "Target.hpp"
 #include <mutex>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <memoryapi.h>
+#include <fileapi.h>
+#endif
+
 #define PARALLELIZATION 1
 
 using namespace std;
@@ -43,9 +49,29 @@ public:
 #endif
         inj.push_back(*i);
     }
-    void logOnfile(){
+
+#ifdef _WIN32
+static void writeLog(const string& log, HANDLE& h){
+    bool bErrorFlag = WriteFile(
+            h,           // open file handle
+            log.c_str(),      // start of data to write
+            log.length(),  // number of bytes to write
+            NULL, // number of bytes that were written
+            NULL);            // no overlapped structure
+
+    if (FALSE == bErrorFlag)
+    {
+        printf("Terminal failure: Unable to write to file.\n");
+    }
+}
+
+#endif
+
+    void logOnfile() {
         time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + " ---\n--------------------------\n";
+        string init_str =
+                "--------------------------\nWriting results of " + string(ctime(&time)) + " --- Injected Object : " +
+                inj.back().object.getName() + " ---\n--------------------------\n";
 #ifdef linux
         logFile = fopen("../logs/logFile.txt", "a");
         string cmd = "flock " + to_string(fileno(logFile));
@@ -58,23 +84,41 @@ public:
         fclose(logFile);
 #endif
 #ifdef _WIN32
-        HANDLE h = CreateFile(file,                // name of the write
-                       GENERIC_READ,          // open for reading
-                       0,                      // do not share
-                       NULL,                   // default security
-                       OPEN_EXISTING,             //
-                       FILE_ATTRIBUTE_NORMAL,  // normal file
-                       NULL);
-        if(h == INVALID_HANDLE_VALUE)
-        {
+        HANDLE h;
+        long err;
+        do {
+            h = CreateFile("../logs/logFile.txt",                // name of the write
+                              FILE_APPEND_DATA,          // append
+                              0,                      // do not share
+                              NULL,                   // default security
+                              OPEN_ALWAYS,             //
+                              FILE_ATTRIBUTE_NORMAL,  // normal file
+                              NULL);
+            err = GetLastError();
+            cout << "Creating log file\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }while(err == 32);
+
+        if (h == INVALID_HANDLE_VALUE) {
             printf("hFile is NULL\n");
-            printf("Could not open golden\n");
-    // return error
-            return 4;
+            printf("Could not open log\n");
+
+            // return error
+            exit(-1);
         }
-        //TODO: create lock on file and then write --> use LockFileEx
+
+        writeLog(init_str, h);
+        for (const Injection &i : inj) {
+            string s_inj =
+                    "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) +
+                    " --- Fault type : " + i.faultType + "\n";
+            writeLog(s_inj, h);
+        }
+            CloseHandle(h);
 #endif
-    }
+        }
+
+
     void printInj(){
         cout << endl;
         time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

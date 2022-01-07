@@ -16,6 +16,8 @@
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
+#define WRITE_ON_FILE 1
+
 using namespace std;
 Logger logger;
 //TODO: addresses need to be updated, only the 16th (xTickCount) is correct
@@ -302,7 +304,11 @@ int main(int argc, char **argv) {
     gold.close();
     injectRTOS(pi, numInjection, chosen, timer_range, gtime);
 
+#if WRITE_ON_FILE
+    logger.logOnfile();
+#else
     logger.printInj();
+#endif
 
     return 0;
 }
