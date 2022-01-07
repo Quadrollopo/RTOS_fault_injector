@@ -109,6 +109,8 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
+#define PARALLELIZATION 0
+
 /*-----------------------------------------------------------*/
 
 /*
@@ -128,27 +130,9 @@ static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle );
 
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = (void *) 0;
-static StaticQueue_t xStaticQueue;
-uint8_t ucQueueStorageArea[ mainQUEUE_LENGTH * 50 ];
-
-/* Structure that will hold the TCB of the task being created. */
-StaticTask_t xTaskBuffer1;
-StaticTask_t xTaskBuffer2;
-
-/* Buffer that the task being created will use as its stack.  Note this is
-an array of StackType_t variables.  The size of StackType_t is dependent on
-the RTOS port. */
-StackType_t xStack1[ 200 ];
-StackType_t xStack2[ 200 ];
-
-/* An array of StaticTimer_t structures, which are used to store
- the state of each created timer. */
-StaticTimer_t xTimerBuffer;
 
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
-static TaskHandle_t task1 = NULL;
-static TaskHandle_t task2 = NULL;
 
 //TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
 
@@ -165,12 +149,11 @@ void main_blinky( void )
     const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
     /* Create the queue. */
-    xQueue = xQueueCreateStatic( mainQUEUE_LENGTH, sizeof( char )*50, ucQueueStorageArea, &xStaticQueue);
+    xQueue = xQueueCreate(mainQUEUE_LENGTH, sizeof( char )*50);
     char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     DWORD pid = GetCurrentProcessId(); //getpid
     snprintf(falso, 32, "../files/Falso_Dante_%d.txt", (unsigned int)pid);
 
-    printf(falso);
     if( xQueue != NULL )
     {
         fR = fopen("..\\Vero_Dante.txt", "r");
@@ -186,23 +169,23 @@ void main_blinky( void )
         else {
             /* Start the two tasks as described in the comments at the top of this
             file. */
-            task1 = xTaskCreateStatic( /*myReceiver,*/ prvQueueReceiveTask,            /* The function that implements the task. */
-                                                       "RX",                            /* The text name assigned to the task - for debug only as it is not used by the kernel. */
-                                                       configMINIMAL_STACK_SIZE,        /* The size of the stack to allocate to the task. */
-                                                       NULL,                            /* The parameter passed to the task - not used in this simple case. */
-                                                       mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority assigned to the task. */
-                                                       xStack1, &xTaskBuffer1);                            /* The task handle is not required, so NULL is passed. */
+            xTaskCreate( /*myReceiver,*/ prvQueueReceiveTask,            /* The function that implements the task. */
+                                         "RX",                            /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+                                         configMINIMAL_STACK_SIZE,        /* The size of the stack to allocate to the task. */
+                                         NULL,                            /* The parameter passed to the task - not used in this simple case. */
+                                         mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority assigned to the task. */
+                                         NULL);                            /* The task handle is not required, so NULL is passed. */
 
-            task2 = xTaskCreateStatic(prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, xStack2, &xTaskBuffer2);
+            xTaskCreate(prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL);
             //xTaskCreate( mySender, /*prvQueueSendTask,*/ "Sender", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
             /* Create the software timer, but don't start it yet. */
-            xTimer = xTimerCreateStatic(
+            xTimer = xTimerCreate(
                     "Timer",                /* The text name assigned to the software timer - for debug only as it is not used by the kernel. */
                     xTimerPeriod,        /* The period of the software timer in ticks. */
                     pdTRUE,                /* xAutoReload is set to pdTRUE. */
                     NULL,                /* The timer's ID is not used. */
-                    prvQueueSendTimerCallback, &xTimerBuffer);/* The function executed when the timer expires. */
+                    prvQueueSendTimerCallback);/* The function executed when the timer expires. */
 
             if (xTimer != NULL) {
                 xTimerStart(xTimer, 0);
@@ -223,27 +206,6 @@ void main_blinky( void )
     FreeRTOS web site for more details. */
 }
 /*-----------------------------------------------------------*/
-
-/*static void mySender(void *params) {
-  (void*)params;
-  int i = 0;
-  while (1) {
-    printf("Sender task inserting %d\n", i);
-    xQueueSend(xQueue, &i, 1000);
-    i++;
-    vTaskDelay(1000);
-  }
-}
-
-static void myReceiver(void* params) {
-  (void*)params;
-  int i;
-  while (1) {
-    xQueueReceive(xQueue, &i, 2000);
-    printf("Receiver task reading %d\n", i);
-    vTaskDelay(1000);
-  }
-}*/
 
 
 static void prvQueueSendTask( void *pvParameters )
@@ -266,9 +228,11 @@ static void prvQueueSendTask( void *pvParameters )
     for( ;; )
     {
         res = fgets(line, 50, fR);
-        if(res == NULL) break;
+        if(res == NULL) vTaskEndScheduler();
         msg[1] = line;
+#if !PARALLELIZATION
         printf("Row read from file Vero_Dante\n");
+#endif
         /* Place this task in the blocked state until it is time to run again.
         The block time is specified in ticks, pdMS_TO_TICKS() was used to
         convert a time specified in milliseconds into a time specified in ticks.
@@ -330,16 +294,16 @@ static void prvQueueReceiveTask( void *pvParameters )
         if( !strcmp(ulReceivedValue[0], "Task") )
         {
             fprintf(fW, "%s", ulReceivedValue[1]);
+#if !PARALLELIZATION
             printf( "Message write on file Falso_Dante\n");
-            //console_print(string1);
-            //console_print(string2);
-            //console_print(string3);
-            //console_print("\n");
+#endif
         }
         else if( !strcmp(ulReceivedValue[0], "Timer") )
         {
             fprintf(fW, "%s", ulReceivedValue[1]);
+#if !PARALLELIZATION
             printf( "Message received from software timer\n" );
+#endif
             N++;
             if(N == 3)
                 vTaskEndScheduler();
