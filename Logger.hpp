@@ -24,7 +24,7 @@ public:
 class Logger{
 private:
     list<Injection> inj;
-    fstream logFile;
+    FILE* logFile;
 #if PARALLELIZATION
     mutex m;
 #endif
@@ -44,17 +44,36 @@ public:
         inj.push_back(*i);
     }
     void logOnfile(){
-        logFile.open("../logs/logFile.txt", ios::app);
         time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        if(!logFile)
-            logFile.open("../logs/logFile.txt", ios::in | ios::out);
         string init_str = "--------------------------\nWriting results of "  + string(ctime(&time)) + " --- Injected Object : " + inj.back().object.getName() + " ---\n--------------------------\n";
-        logFile.write(init_str.c_str(), (long) init_str.size());
+#ifdef linux
+        logFile = fopen("../logs/logFile.txt", "a");
+        string cmd = "flock " + to_string(fileno(logFile));
+        system(cmd.c_str());
+        fprintf(logFile, "%s", init_str.c_str());
         for(const Injection& i : inj){
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
-            logFile.write(s_inj.c_str(), (int) s_inj.length());
+            fprintf(logFile, "%s", s_inj.c_str());
         }
-        logFile.close();
+        fclose(logFile);
+#endif
+#ifdef _WIN32
+        HANDLE h = CreateFile(file,                // name of the write
+                       GENERIC_READ,          // open for reading
+                       0,                      // do not share
+                       NULL,                   // default security
+                       OPEN_EXISTING,             //
+                       FILE_ATTRIBUTE_NORMAL,  // normal file
+                       NULL);
+        if(h == INVALID_HANDLE_VALUE)
+        {
+            printf("hFile is NULL\n");
+            printf("Could not open golden\n");
+    // return error
+            return 4;
+        }
+        //TODO: create lock on file and then write --> use LockFileEx
+#endif
     }
     void printInj(){
         cout << endl;
@@ -65,11 +84,6 @@ public:
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType + "\n";
             cout << s_inj;
         }
-    }
-
-    virtual ~Logger() {
-        if(logFile.is_open())
-            logFile.close();
     }
 
 };
