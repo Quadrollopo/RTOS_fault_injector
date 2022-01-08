@@ -89,7 +89,8 @@ long getFileLen(ifstream &file) {
 
 int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
 	ifstream golden_output("../files/Golden_execution.txt");
-	ifstream rtos_output("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
+	string fileName = "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt";
+	ifstream rtos_output(fileName);
 	bool found = false;
 	long s1, s2;
 	int error = 0; // 0 --> Masked, 1 --> SDC, 2 --> Crash
@@ -131,6 +132,7 @@ int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<lon
 			logger.addInjection(name, addr, elapsed, "SDC");
 	}
 	rtos_output.close();
+	remove(fileName.c_str());
 	golden_output.close();
 	return error;
 }
