@@ -19,7 +19,7 @@ f.close()
 s = ""
 
 for i in range(len(addr)):
-	if i >=27:
+	if i >=14:
 		s+="{\"" +  names[i] + "\", " + addr[i] + ", " + sizes[i] + ", true}, "
 	else:
 		s+="{\"" +  names[i] + "\", " + addr[i] + ", " + sizes[i] + ", false}, "

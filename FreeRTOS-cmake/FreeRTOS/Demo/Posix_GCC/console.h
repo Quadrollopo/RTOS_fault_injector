@@ -27,7 +27,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#define PARALLEL 1
+#define PARALLEL 0
 
 #ifdef __cplusplus
 extern "C" {
