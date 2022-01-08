@@ -193,7 +193,6 @@ void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer
         long inj_addr;
         thread injection(injector, pi, objects[chosen], &inj_addr, timer_range);
         injection.join();
-        LPDWORD type_error = nullptr;
 
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
 
