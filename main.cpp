@@ -236,6 +236,10 @@ void menu(int &c, int &range, int &numInjection) {
 
 void fillAddresses(){
     ifstream file("gdb.output");
+    if (!file.is_open()){
+        cout << "Cannot open gdb.output\n";
+        exit(-1);
+    }
     for(Target& obj : objects){
         char n[100];
         long addr;
@@ -245,6 +249,7 @@ void fillAddresses(){
         obj.setAddress(addr);
     }
     file.close();
+    system("sudo rm gdb.output");
 }
 
 int main() {
