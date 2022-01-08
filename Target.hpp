@@ -30,4 +30,8 @@ public:
         return pointer;
     }
 
+    void setAddress(long address) {
+        this->address = address;
+    }
+
 };

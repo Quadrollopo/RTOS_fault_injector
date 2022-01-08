@@ -15,7 +15,7 @@ set $pointers = {&xTimerTaskHandle, &xTimerQueue, &pxOverflowTimerList, &pxCurre
 
 while ($ipx < 14)
 	x $vars[$ipx]
-	p sizeof *$vars[$ipx]
+	#p sizeof *$vars[$ipx]
 	set $ipx=$ipx+1
 end
 
@@ -24,7 +24,7 @@ set $end = 9
 
 while ($ipx < 9)
     x $pointers[$ipx]
-    p sizeof **$pointers[$ipx]
+    #p sizeof **$pointers[$ipx]
     set $ipx=$ipx+1
 end
 
