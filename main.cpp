@@ -150,9 +150,9 @@ void execGolden(chrono::duration<long, ratio<1, 1000>> &gtime) {
 	int status;
     waitpid(pid_golden, &status, 0);
     //Golden time
-    gtime = chrono::duration_cast<chrono::milliseconds>(
-            chrono::steady_clock::now() - beginTime);
-    cout << endl << "Golden time : " << gtime.count() << endl;
+	gtime = chrono::duration_cast<chrono::milliseconds>(
+			chrono::steady_clock::now() - beginTime);
+	cout << endl << "Golden time : " << gtime.count() << endl;
 	ofstream time_golden("../files/Time_golden.txt");
 	if (time_golden)
 		time_golden << gtime.count();
@@ -160,8 +160,8 @@ void execGolden(chrono::duration<long, ratio<1, 1000>> &gtime) {
 		cout << "Can't create Time_golden.txt";
 	time_golden.close();
 	cnt = 0;
-	const string cmd = "mv ../files/Falso_Dante_" + to_string(pid_golden) + ".txt ../files/Golden_execution.txt";
-	system((const char *) cmd.c_str());
+	const string old = "../files/Falso_Dante_" + to_string(pid_golden) + ".txt";
+	rename(old.c_str(), "../files/Golden_execution.txt");
 }
 
 void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime, int iter) {
@@ -248,8 +248,8 @@ void fillAddresses(){
         sscanf(n, "%lx %s", &addr, trash);
         obj.setAddress(addr);
     }
-    file.close();
-    system("sudo rm gdb.output");
+	file.close();
+	remove("gdb.output");
 }
 
 int main() {
