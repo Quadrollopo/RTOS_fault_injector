@@ -193,6 +193,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer
         long inj_addr;
         thread injection(injector, pi, objects[chosen], &inj_addr, timer_range);
         injection.join();
+        LPDWORD type_error = nullptr;
 
         chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
 
@@ -200,9 +201,8 @@ void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer
         DWORD hang;
         hang = WaitForSingleObject(pi.hProcess, gtime.count()*2);
         if (hang == WAIT_TIMEOUT) { //HANG
-            LPDWORD type_error = nullptr;
             cout << endl << "Timeot expired, killing process " << endl;
-            TerminateProcess(pi.hProcess, GetExitCodeProcess(pi.hProcess, type_error));
+            TerminateProcess(pi.hProcess, 0);
 
             logger.addInjection(name, inj_addr, elapsed, "Hang");
         }

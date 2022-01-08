@@ -88,7 +88,7 @@ endif()
 ################################################################################
 if(MSVC)
     # remove default flags provided with CMake for MSVC
-    set(CMAKE_EXE_LINKER_FLAGS "-no-pie")
+    set(CMAKE_EXE_LINKER_FLAGS "-lstdc++ -ggdb3 -O0 -pthread -no-pie")
     set(CMAKE_MODULE_LINKER_FLAGS "")
     set(CMAKE_SHARED_LINKER_FLAGS "")
     set(CMAKE_STATIC_LINKER_FLAGS "")
