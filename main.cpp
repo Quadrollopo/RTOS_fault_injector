@@ -21,18 +21,20 @@ vector<Target> objects = {{"xActiveTimerList1", 0x431a40, 40, false}, {"hMainThr
 static volatile int cnt = 0;
 
 int injector(pid_t pid, const Target& t, long *chosenAddr, int timer_range) {
-    this_thread::sleep_for(chrono::milliseconds(rand() % timer_range));
-    cout << "Child starting injector" << endl;
-    fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
-    if (!memFile.is_open()) {
-        cout << "Can't open file /proc/" + to_string(pid) + "/mem" << endl;
-        return -1;
-    }
-    random_device generator;
-    uniform_int_distribution<int> bit_distribution(0, 7);
-    uint8_t byte, mask = bit_distribution(generator);
-    uniform_int_distribution<long> address_distribution;
-    if(!t.isPointer())
+	random_device generator;
+	uniform_int_distribution<int> random_time(100, timer_range);
+	int millisecond_time = random_time(generator);
+	this_thread::sleep_for(chrono::milliseconds(millisecond_time));
+	cout << "Child starting injector" << endl;
+	fstream memFile("/proc/" + to_string(pid) + "/mem", ios::binary | ios::in | ios::out);
+	if (!memFile.is_open()) {
+		cout << "Can't open file /proc/" + to_string(pid) + "/mem" << endl;
+		return -1;
+	}
+	uniform_int_distribution<int> bit_distribution(0, 7);
+	uint8_t byte, mask = bit_distribution(generator);
+	uniform_int_distribution<long> address_distribution;
+	if (!t.isPointer())
         address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
     else {
         memFile.seekg(t.getAddress());
@@ -56,7 +58,7 @@ int injector(pid_t pid, const Target& t, long *chosenAddr, int timer_range) {
     memFile.close();
     *chosenAddr = addr;
     cout << hex << *chosenAddr << endl;
-    return 0;
+	return millisecond_time;
 }
 
 void rtos() {
