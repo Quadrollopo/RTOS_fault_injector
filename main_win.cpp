@@ -21,7 +21,7 @@
 using namespace std;
 Logger logger;
 //TODO: addresses need to be updated, only the 16th (xTickCount) is correct
-vector<Target> objects = {{"xActiveTimerList1", 0x00711c08, 40, false}, {"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"xTimerTaskHandle", 0x00711c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
+vector<Target> objects = {{"xActiveTimerList1", 0x00711c08, 40, false}, {"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"xTimerTaskHandle", 0x00b21c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
 
 static volatile int cnt = 0;
 using namespace std;
@@ -39,12 +39,12 @@ int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int tim
     if(!t.isPointer())
         address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
     else {
-        SIZE_T length_read = 0;
         uint8_t h[4];
-        ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), h, (size_t)4,
-                          &length_read);
-        if(length_read == 0)
-            cerr<<"Houston we have a problem..." <<endl;
+        if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &h, (size_t)4,
+                              NULL)) {
+            cerr << "Houston we have a problem... " << GetLastError() << endl;
+            return -1;
+        }
         long heapAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         address_distribution = uniform_int_distribution<long>(heapAddress, heapAddress + t.getSize());
     }
@@ -54,8 +54,7 @@ int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int tim
     int err = 0;
     if(!ReadProcessMemory(pi.hProcess, (LPVOID)(addr), &byte, (SIZE_T)1,
                       &length_read)) {
-        err = GetLastError();
-        cout << err;
+        cout << GetLastError();
     }
 
     //Flipbit

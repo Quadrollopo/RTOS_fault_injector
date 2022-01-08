@@ -88,8 +88,8 @@ endif()
 ################################################################################
 if(MSVC)
     # remove default flags provided with CMake for MSVC
-    set(CMAKE_EXE_LINKER_FLAGS "-lstdc++ -ggdb3 -O0 -pthread -no-pie")
-    set(CMAKE_MODULE_LINKER_FLAGS "")
+    set(CMAKE_EXE_LINKER_FLAGS "")
+	set(CMAKE_MODULE_LINKER_FLAGS "")
     set(CMAKE_SHARED_LINKER_FLAGS "")
     set(CMAKE_STATIC_LINKER_FLAGS "")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS}")
@@ -229,7 +229,9 @@ set(ALL_FILES
 # Target
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
-
+	if(MSVC)
+		target_link_options(RTOSDemo PUBLIC /DYNAMICBASE:NO /BASE:0x400000 /INCREMENTAL:NO /OPT:NOREF)
+	endif()
 ################################################################################
 # Target name
 ################################################################################
