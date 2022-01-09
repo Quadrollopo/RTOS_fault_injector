@@ -1343,6 +1343,8 @@ BaseType_t xTimerGenericCommand( TimerHandle_t xTimer,
                                           StackType_t ** ppxTimerTaskStackBuffer,
                                               uint32_t * pulTimerTaskStackSize );
 
+void getTimerVars(long* timerVars);
+
 #endif
 
 /* *INDENT-OFF* */

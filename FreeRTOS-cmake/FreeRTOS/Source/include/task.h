@@ -3063,7 +3063,7 @@ TaskHandle_t pvTaskIncrementMutexHeldCount( void ) PRIVILEGED_FUNCTION;
  */
 void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
 
-
+void getTaskVars(long* taskVars);
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     }
