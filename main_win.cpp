@@ -213,7 +213,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer
 
         int err = 0;
         if(hang!=WAIT_TIMEOUT)
-            err = checkFiles(objects[chosen].getName(), (unsigned int)pid_rtos, inj_addr, elapsed);
+            err = checkFiles(objects[chosen].getName(), pid_rtos, inj_addr, elapsed);
 
         long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
 
@@ -269,6 +269,24 @@ void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> 
 
 
     // Close process and thread handles.
+}
+
+void fillAddresses(){
+    ifstream file("rtos.output");
+    if (!file.is_open()){
+        cout << "Cannot open rtos.output\n";
+        exit(-1);
+    }
+    //TODO: order object list
+    for(Target& obj : objects){
+        char n[100];
+        long addr;
+        file.getline(n, 100);
+        sscanf(n, "%lx", &addr);
+        obj.setAddress(addr);
+    }
+    file.close();
+    remove("rtos.output");
 }
 
 int main(int argc, char **argv) {

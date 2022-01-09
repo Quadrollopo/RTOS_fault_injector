@@ -1116,3 +1116,12 @@
  * to include software timer functionality.  If you want to include software timer
  * functionality then ensure configUSE_TIMERS is set to 1 in FreeRTOSConfig.h. */
 #endif /* configUSE_TIMERS == 1 */
+
+
+void getTimerVars(long* timerVars){
+    timerVars[0] = (long) &xActiveTimerList1;
+    timerVars[1] = (long) &xTimerTaskHandle;
+    timerVars[2] = (long) &xTimerQueue;
+    timerVars[3] = (long) &pxOverflowTimerList;
+    timerVars[4] = (long) &pxCurrentTimerList;
+}

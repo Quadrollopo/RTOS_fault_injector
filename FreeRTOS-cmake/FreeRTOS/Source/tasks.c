@@ -5431,3 +5431,21 @@ TickType_t uxTaskResetEventItemValue( void )
     #endif
 
 #endif /* if ( configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H == 1 ) */
+
+
+void getTaskVars(long* taskVars){
+    taskVars[0] = (long) &pxReadyTasksLists;
+    taskVars[1] = (long) &xDelayedTaskList1;
+    taskVars[2] = (long) &xPendingReadyList;
+    taskVars[3] = (long) &xSuspendedTaskList;
+    taskVars[4] = (long) &uxTopReadyPriority;
+    taskVars[5] = (long) &xTickCount;
+    taskVars[6] = (long) &xPendedTicks;
+    taskVars[7] = (long) &uxSchedulerSuspended;
+    taskVars[8] = (long) &xNextTaskUnblockTime;
+    taskVars[9] = (long) &xSchedulerRunning;
+    taskVars[10] = (long) &uxTaskNumber;
+    taskVars[11] = (long) &pxCurrentTCB;
+    taskVars[12] = (long) &pxDelayedTaskList;
+    taskVars[13] =  (long) &xIdleTaskHandle;
+}
