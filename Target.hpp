@@ -11,8 +11,9 @@ private:
     long address;
     int size;
     bool pointer;
+    string subName;
 public:
-    Target(string name, long address, int size, bool pointer=false) : name(std::move(name)), address(address), size(size), pointer(pointer){};
+    Target(string name, long address, int size, bool pointer=false, string subName="") : name(std::move(name)), address(address), size(size), pointer(pointer), subName(std::move(subName)){};
 
     string getName() const {
         return name;
@@ -33,5 +34,14 @@ public:
     void setAddress(long address) {
         this->address = address;
     }
+
+    void setSubName(const string &subName) {
+        Target::subName = subName;
+    }
+
+    const string &getSubName() const {
+        return subName;
+    }
+
 
 };

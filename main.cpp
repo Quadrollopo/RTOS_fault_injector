@@ -20,7 +20,59 @@ Logger logger;
 vector<Target> objects = {{"xActiveTimerList1", 0x4315e0, 40, false}, {"hMainThread", 0x431ff0, 8, false}, {"xResumeSignals", 0x431e40, 128, false}, {"pxReadyTasksLists", 0x431320, 280, false}, {"xDelayedTaskList1", 0x431440, 40, false}, {"xPendingReadyList", 0x4314c0, 40, false}, {"xSuspendedTaskList", 0x431540, 40, false}, {"uxTopReadyPriority", 0x431578, 8, false}, {"xTickCount", 0x431570, 8, false}, {"xPendedTicks", 0x431588, 8, false}, {"uxSchedulerSuspended", 0x4315b8, 8, false}, {"xNextTaskUnblockTime", 0x4315a8, 8, false}, {"xSchedulerRunning", 0x431580, 8, false}, {"uxTaskNumber", 0x4315a0, 8, false}, {"xTimerTaskHandle", 0x431660, 176, true}, {"xTimerQueue", 0x431658, 168, true}, {"pxOverflowTimerList", 0x431650, 40, true}, {"pxCurrentTimerList", 0x431648, 40, true}, {"pxCurrentTCB", 0x431300, 176, true}, {"pxDelayedTaskList", 0x4314a8, 40, true}, {"xIdleTaskHandle", 0x4315b0, 176, true}, {"xQueue", 0x431d90, 168, true}, {"xTimer", 0x431d98, 88, true}};
 static volatile int cnt = 0;
 
-int injector(pid_t pid, const Target& t, long *chosenAddr, int timer_range) {
+void getAddress(fstream& memFile, uint8_t *h, long address){
+    memFile.seekg(address);
+    memFile.read(reinterpret_cast<char *>(h), 4);
+}
+
+long getRandomAddressInRange(long a1, long a2){
+    random_device generator;
+    uniform_int_distribution<long> address_distribution = uniform_int_distribution<long>(a1, a2);
+    return (long) address_distribution(generator);
+}
+
+long inject_timer(fstream& memFile, long address, Target& t){
+    uint8_t h[4];
+    getAddress(memFile, h, objects[22].getAddress());
+    long timer = (long) (h[0] + h[1]*256 + h[2]*256*256);
+    if (address > timer and address < timer + 8) {
+        cout << "Injecting xTimer name\n";
+        t.setSubName("xTimer->name");
+        getAddress(memFile, h, timer);
+        return (long) (h[0] + h[1]*256 + h[2]*256*256);
+    }
+    else if(address > timer + 8 and address < timer + 48) {
+        cout << "Injecting xTimer->xTimerListItem\n";
+        t.setSubName("xTimer->xTimerListItem");
+        if(address < timer + 16) {
+            t.setSubName("xTimer->xTimerListItem->xItemValue");
+            cout << "Injecting xItemValue\n";
+        }
+        else if (address < timer +  24) {
+            t.setSubName("xTimer->xTimerListItem->pxNext");
+            cout << "Injecting pxNext\n";
+        }
+        else if(address > timer + 40) {
+            t.setSubName("xTimer->xTimerListItem->pvContainer");
+            cout << "Injecting pvContainer\n";
+            getAddress(memFile, h, timer + 40);
+            long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+            return getRandomAddressInRange(newAddress, newAddress + 40);
+        }
+        return address;
+    }
+    else if (address > timer + 48 and address < timer + 56) {
+        t.setSubName("xTimer->xTimerPeriodInTicks");
+        cout << "Injecting xTimer->xTimerPeriodInTicks\n";
+    }
+    else if (address > timer + 64 and address < timer + 72) {
+        t.setSubName("xTimer->callback");
+        cout << "Injecting xTimer callback function\n";
+    }
+    return address;
+}
+
+int injector(pid_t pid, Target& t, long *chosenAddr, int timer_range) {
 	random_device generator;
 	uniform_int_distribution<int> random_time(100, timer_range);
 	int millisecond_time = random_time(generator);
@@ -34,16 +86,17 @@ int injector(pid_t pid, const Target& t, long *chosenAddr, int timer_range) {
 	uniform_int_distribution<int> bit_distribution(0, 7);
 	uint8_t byte, mask = bit_distribution(generator);
 	uniform_int_distribution<long> address_distribution;
-	if (!t.isPointer())
+    if (!t.isPointer())
         address_distribution = uniform_int_distribution<long>(t.getAddress(), t.getAddress() + t.getSize());
-    else {
-        memFile.seekg(t.getAddress());
+    else{
         uint8_t h[4];
-        memFile.read(reinterpret_cast<char *>(h), 4);
+        getAddress(memFile, h, t.getAddress());
         long heapAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         address_distribution = uniform_int_distribution<long>(heapAddress, heapAddress + t.getSize());
     }
     long addr = address_distribution(generator);
+    if(t.getName() == "xTimer")
+        addr = inject_timer(memFile, addr, t);
     memFile.seekg(addr);
     byte = memFile.peek();
 
@@ -87,7 +140,7 @@ long getFileLen(ifstream &file) {
 	return (long) length;
 }
 
-int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+int checkFiles(Target &t, pid_t pid_rtos, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
 	ifstream golden_output("../files/Golden_execution.txt");
 	string fileName = "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt";
 	ifstream rtos_output(fileName);
@@ -110,7 +163,7 @@ int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<lon
 
 	if (s2 == 0) { // Crash
 		cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-		logger.addInjection(name, addr, elapsed, "Crash");
+		logger.addInjection(t, elapsed, "Crash");
 		error = 2;
 	} else {
         if(s1 == s2) {
@@ -127,9 +180,9 @@ int checkFiles(const string& name, int pid_rtos, long addr, chrono::duration<lon
             found = true;
 		if (!found) { //Masked
 			cout << endl << "No differences have been found" << endl;
-			logger.addInjection(name, addr, elapsed, "Masked");
+			logger.addInjection(t, elapsed, "Masked");
 		} else
-			logger.addInjection(name, addr, elapsed, "SDC");
+			logger.addInjection(t, elapsed, "SDC");
 	}
 	rtos_output.close();
 	remove(fileName.c_str());
@@ -181,7 +234,9 @@ void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 100
 	}
 
 	long inj_addr;
-	injector(pid_rtos, objects[chosen], &inj_addr, timer_range);
+    auto *t = new Target(objects[chosen]);
+	injector(pid_rtos, *t, &inj_addr, timer_range);
+    t->setAddress(inj_addr);
 
 	chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(
 			chrono::steady_clock::now() - begin);
@@ -194,7 +249,7 @@ void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 100
 		cout << endl << "Timeout expired, killing process " << endl;
 		kill(pid_rtos, SIGKILL);
 
-		logger.addInjection(name, inj_addr, elapsed, "Hang");
+		logger.addInjection(reinterpret_cast<Target &>(*t), elapsed, "Hang");
 	} else if (cnt > 0) {
 		cnt = 0;
 	}
@@ -207,16 +262,16 @@ void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 100
 
 	int err = 0;
 	if (hang != 0)
-		err = checkFiles(name, pid_rtos, inj_addr, elapsed);
+		err = checkFiles(*t, pid_rtos, elapsed);
 
 	long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
     bool delay = abs(timeDifference) > 750 || abs(timeDifference) < 650;
 
 	if (delay && hang != 0 && err != 2) //delay detected when there was not a crash or a hang
-		logger.addInjection(name, inj_addr, elapsed, "Delay");
+		logger.addInjection(reinterpret_cast<Target &>(*t), elapsed, "Delay");
 
 	cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
-
+    delete t;
 }
 
 void menu(int &c, int &range, int &numInjection) {
