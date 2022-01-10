@@ -77,7 +77,7 @@ static void writeLog(const string& log, HANDLE& h){
         fprintf(logFile, "%s", init_str.c_str());
         for(const Injection& i : inj){
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType +
-                                   ((!i.object.getSubName().empty()) ? "--- Struct parameter : " + i.object.getSubName() + "\n" : "\n");
+                                   ((!i.object.getSubName().empty()) ? " --- Struct parameter : " + i.object.getSubName() + "\n" : "\n");
             fprintf(logFile, "%s", s_inj.c_str());
         }
         fclose(logFile);
@@ -125,7 +125,7 @@ static void writeLog(const string& log, HANDLE& h){
         cout << init_str;
         for(const Injection& i : inj){
             string s_inj = "Address : " + to_string(i.object.getAddress()) + " --- Time : " + to_string(i.elapsed.count()) + " --- Fault type : " + i.faultType +
-                    ((!i.object.getSubName().empty()) ? "--- Struct parameter : " + i.object.getSubName() + "\n" : "\n");;
+                    ((!i.object.getSubName().empty()) ? " --- Struct parameter : " + i.object.getSubName() + "\n" : "\n");;
             cout << s_inj;
         }
     }

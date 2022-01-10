@@ -17,7 +17,7 @@
 
 using namespace std;
 Logger logger;
-vector<Target> objects = {{"xActiveTimerList1", 0x4315e0, 40, false}, {"hMainThread", 0x431ff0, 8, false}, {"xResumeSignals", 0x431e40, 128, false}, {"pxReadyTasksLists", 0x431320, 280, false}, {"xDelayedTaskList1", 0x431440, 40, false}, {"xPendingReadyList", 0x4314c0, 40, false}, {"xSuspendedTaskList", 0x431540, 40, false}, {"uxTopReadyPriority", 0x431578, 8, false}, {"xTickCount", 0x431570, 8, false}, {"xPendedTicks", 0x431588, 8, false}, {"uxSchedulerSuspended", 0x4315b8, 8, false}, {"xNextTaskUnblockTime", 0x4315a8, 8, false}, {"xSchedulerRunning", 0x431580, 8, false}, {"uxTaskNumber", 0x4315a0, 8, false}, {"xTimerTaskHandle", 0x431660, 176, true}, {"xTimerQueue", 0x431658, 168, true}, {"pxOverflowTimerList", 0x431650, 40, true}, {"pxCurrentTimerList", 0x431648, 40, true}, {"pxCurrentTCB", 0x431300, 176, true}, {"pxDelayedTaskList", 0x4314a8, 40, true}, {"xIdleTaskHandle", 0x4315b0, 176, true}, {"xQueue", 0x431d90, 168, true}, {"xTimer", 0x431d98, 88, true}};
+vector<Target> objects = {{"xActiveTimerList1", 0x4315e0, 40, false}, {"hMainThread", 0x431ff0, 8, false}, {"xResumeSignals", 0x431e40, 128, false}, {"pxReadyTasksLists", 0x431320, 280, false}, {"xDelayedTaskList1", 0x431440, 40, false}, {"xPendingReadyList", 0x4314c0, 40, false}, {"xSuspendedTaskList", 0x431540, 40, false}, {"uxTopReadyPriority", 0x431578, 8, false}, {"xTickCount", 0x431570, 8, false}, {"xPendedTicks", 0x431588, 8, false}, {"uxSchedulerSuspended", 0x4315b8, 8, false}, {"xNextTaskUnblockTime", 0x4315a8, 8, false}, {"xSchedulerRunning", 0x431580, 8, false}, {"uxTaskNumber", 0x4315a0, 8, false}, {"xTimerTaskHandle", 0x431660, 176, true}, {"xTimerQueue", 0x431658, 168, true}, {"pxOverflowTimerList", 0x431650, 40, true}, {"pxCurrentTimerList", 0x431648, 40, true}, {"pxCurrentTCB", 0x431300, 176, true}, {"pxDelayedTaskList", 0x4314a8, 40, true}, {"xIdleTaskHandle", 0x4315b0, 176, true}, {"xQueue", 0x431d90, 8, true}, {"xTimer", 0x431d98, 88, true}};
 static volatile int cnt = 0;
 
 void getAddress(fstream& memFile, uint8_t *h, long address){
@@ -31,6 +31,43 @@ long getRandomAddressInRange(long a1, long a2){
     return (long) address_distribution(generator);
 }
 
+long inject_queue(fstream& memFile, long address, Target& t){
+    uint8_t h[4];
+    if(t.getName() == "xQueue")
+        getAddress(memFile, h, objects[21].getAddress());
+    else
+        getAddress(memFile, h, objects[15].getAddress());
+    long queue = (long) (h[0] + h[1]*256 + h[2]*256*256);
+
+    if (address >= queue and address < queue + 8) {
+        cout << "Injecting " << t.getName() << "->pcHead\n";
+        t.setSubName(t.getName() + "->pcHead");
+        getAddress(memFile, h, queue);
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 50);
+    }
+    else if(address >= queue + 8 and address < queue + 16) {
+        cout << "Injecting " << t.getName() << "pcWriteTo\n";
+        t.setSubName(t.getName() + "->pcWriteTo");
+        getAddress(memFile, h, queue + 8);
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 50);
+    }
+    else if (address >= queue + 120 and address < queue + 128) {
+        cout << "Injecting " << t.getName() << "->uxMessagesWaiting\n";
+        t.setSubName(t.getName() + "->uxMessagesWaiting");
+    }
+    else if(address >= queue + 128 and address < queue + 136) {
+        cout << "Injecting " << t.getName() << "->uxLength\n";
+        t.setSubName(t.getName() + "->uxLength");
+    }
+    else if(address >= queue + 136 and address < queue + 144) {
+        cout << "Injecting " << t.getName() << "->uxItemSize\n";
+        t.setSubName(t.getName() + "->uxItemSize");
+    }
+    return address;
+}
+
 long inject_TCB(fstream& memFile, long address, Target& t){
     uint8_t h[4];
     if(t.getName() == "pxCurrentTCB")
@@ -39,43 +76,43 @@ long inject_TCB(fstream& memFile, long address, Target& t){
         getAddress(memFile, h, objects[14].getAddress());
 
     long tcb = (long) (h[0] + h[1]*256 + h[2]*256*256);
-    if (address > tcb and address < tcb + 8) {
+    if (address >= tcb and address < tcb + 8) {
         cout << "Injecting " << t.getName() << "->pxTopOfStack\n";
         t.setSubName(t.getName() + "->pxTopOfStack");
         return address;
     }
-    else if(address > tcb + 88 and address < tcb + 96) {
+    else if(address >= tcb + 88 and address < tcb + 96) {
         cout << "Injecting " << t.getName() << "uxPriority\n";
         t.setSubName(t.getName() + "->uxPriority");
     }
-    else if (address > tcb + 96 and address < tcb + 104) {
+    else if (address >= tcb + 96 and address < tcb + 104) {
         t.setSubName(t.getName() + "->pxStack");
         cout << "Injecting " << t.getName() << "->pxStack\n";
         getAddress(memFile, h, tcb + 96);
         long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         return getRandomAddressInRange(newAddress, newAddress + 70);
     }
-    else if(address > tcb + 104 and address < tcb + 112) {
+    else if(address >= tcb + 104 and address < tcb + 112) {
         cout << "Injecting " << t.getName() << "->pcTaskName\n";
         t.setSubName(t.getName() + "->pcTaskName");
     }
-    else if(address > tcb + 116 and address < tcb + 124) {
+    else if(address >= tcb + 116 and address < tcb + 124) {
         cout << "Injecting " << t.getName() << "->uxTCBNumber\n";
         t.setSubName(t.getName() + "->uxTCBNumber");
     }
-    else if(address > tcb + 104 and address < tcb + 112) {
+    else if(address >= tcb + 104 and address < tcb + 112) {
         cout << "Injecting " << t.getName() << "->uxTaskNumber\n";
         t.setSubName(t.getName() + "->uxTaskNumber");
     }
-    else if(address > tcb + 112 and address < tcb + 120) {
+    else if(address >= tcb + 112 and address < tcb + 120) {
         cout << "Injecting " << t.getName() << "->uxBasePriority\n";
         t.setSubName(t.getName() + "->uxBasePriority");
     }
-    else if(address > tcb + 120 and address < tcb + 128) {
+    else if(address >= tcb + 120 and address < tcb + 128) {
         cout << "Injecting " << t.getName() << "->callback\n";
         t.setSubName(t.getName() + ">callback");
     }
-    else if(address > tcb + 128 and address < tcb + 136) {
+    else if(address >= tcb + 128 and address < tcb + 136) {
         cout << "Injecting " << t.getName() << "->ulRunTimeCounter\n";
         t.setSubName(t.getName() + "->ulRunTimeCounter");
     }
@@ -86,13 +123,13 @@ long inject_timer(fstream& memFile, long address, Target& t){
     uint8_t h[4];
     getAddress(memFile, h, objects[22].getAddress());
     long timer = (long) (h[0] + h[1]*256 + h[2]*256*256);
-    if (address > timer and address < timer + 8) {
+    if (address >= timer and address < timer + 8) {
         cout << "Injecting xTimer name\n";
         t.setSubName("xTimer->name");
         getAddress(memFile, h, timer);
         return (long) (h[0] + h[1]*256 + h[2]*256*256);
     }
-    else if(address > timer + 8 and address < timer + 48) {
+    else if(address >= timer + 8 and address < timer + 48) {
         cout << "Injecting xTimer->xTimerListItem\n";
         t.setSubName("xTimer->xTimerListItem");
         if(address < timer + 16) {
@@ -112,11 +149,11 @@ long inject_timer(fstream& memFile, long address, Target& t){
         }
         return address;
     }
-    else if (address > timer + 48 and address < timer + 56) {
+    else if (address >= timer + 48 and address < timer + 56) {
         t.setSubName("xTimer->xTimerPeriodInTicks");
         cout << "Injecting xTimer->xTimerPeriodInTicks\n";
     }
-    else if (address > timer + 64 and address < timer + 72) {
+    else if (address >= timer + 64 and address < timer + 72) {
         t.setSubName("xTimer->callback");
         cout << "Injecting xTimer callback function\n";
     }
@@ -148,8 +185,10 @@ int injector(pid_t pid, Target& t, long *chosenAddr, int timer_range) {
     long addr = address_distribution(generator);
     if(t.getName() == "xTimer")
         addr = inject_timer(memFile, addr, t);
-    else if(t.getName() == "pxCurrentTCB")
+    else if(t.getName() == "pxCurrentTCB" or t.getName() == "xTimerTaskHandle")
         addr = inject_TCB(memFile, addr, t);
+    else if(t.getName() == "xQueue" or t.getName() == "xTimerQueue")
+        addr = inject_queue(memFile, addr, t);
     memFile.seekg(addr);
     byte = memFile.peek();
 
@@ -364,7 +403,7 @@ int main() {
     signal(SIGCHLD, sigCHLDHandler);
     signal(SIGINT, sigINTHandler);
     srand(std::chrono::system_clock::now().time_since_epoch().count());
-    //system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space");
+    system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space");
     system("echo \"source ../gdb_stuff/gdb_script\" | sudo gdb freeRTOS > out; rm out");
 	int chosen, numInjection, timer_range;
 	chrono::duration<long, ratio<1, 1000>> gtime{};
@@ -406,6 +445,6 @@ int main() {
 #else
     logger.printInj();
 #endif
-    //system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space");
+    system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space");
 	return 0;
 }
