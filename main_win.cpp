@@ -21,14 +21,14 @@
 using namespace std;
 Logger logger;
 //TODO: addresses need to be updated, only the 16th (xTickCount) is correct
-vector<Target> objects = {{"xActiveTimerList1", 0x00711c08, 40, false}, {"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"xTimerTaskHandle", 0x00b21c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
+vector<Target> objects = {{"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xActiveTimerList1", 0x00711c08, 40, false}, {"xTimerTaskHandle", 0x00b21c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
 
 static volatile int cnt = 0;
 using namespace std;
 
 int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int timer_range) {
     random_device generator;
-    uniform_int_distribution<int> time_dist(0, timer_range);
+    uniform_int_distribution<int> time_dist(100, timer_range);
     this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
     cout << "Child starting injector" << endl;
 
@@ -112,9 +112,10 @@ void menu(int &c, int &range, int &numInjection) {
     cin >> numInjection;
 }
 
-int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+int checkFiles(Target &t, int pid_rtos, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
     ifstream golden_output("../files/Golden_execution.txt");
-    ifstream rtos_output("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt");
+    string fileName = "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt";
+    ifstream rtos_output(fileName);
     bool found = false;
     long s1, s2;
     int error = 0; // 0 --> Masked, 1 --> SDC, 2 --> Crash
@@ -134,7 +135,7 @@ int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std:
 
     if (s2 == 0) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
-        logger.addInjection(name, addr, elapsed, "Crash");
+        logger.addInjection(t, elapsed, "Crash");
         error = 2;
     } else {
         if(s1 == s2) {
@@ -151,78 +152,80 @@ int checkFiles(string name, int pid_rtos, long addr, chrono::duration<long, std:
             found = true;
         if (!found) { //Masked
             cout << endl << "No differences have been found" << endl;
-            logger.addInjection(name, addr, elapsed, "Masked");
+            logger.addInjection(t, elapsed, "Masked");
         } else
-            logger.addInjection(name, addr, elapsed, "SDC");
+            logger.addInjection(t, elapsed, "SDC");
     }
     rtos_output.close();
+    remove(fileName.c_str());
     golden_output.close();
     return error;
 }
 
-void injectRTOS(PROCESS_INFORMATION& pi, int numInjection, int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime){
+void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime){
     DWORD pid_rtos;
     string name = objects[chosen].getName();
-    for(int iter = 0; iter < numInjection; iter++) {
-        cout << endl << "Itering injections, iteration : " << iter << endl;
-        chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        STARTUPINFO si = {sizeof(si)};
 
-        ZeroMemory(&si, sizeof(si));
-        si.cb = sizeof(si);
-        ZeroMemory(&pi, sizeof(pi));
-        if (!CreateProcess(NULL,   // No module name (use command line)
-                           "./RTOSDemo.exe",        // Command line
-                           NULL,           // Process handle not inheritable
-                           NULL,           // Thread handle not inheritable
-                           FALSE,          // Set handle inheritance to FALSE
-                           0,              // No creation flags
-                           NULL,           // Use parent's environment block
-                           NULL,           // Use parent's starting directory
-                           &si,            // Pointer to STARTUPINFO structure
-                           &pi)           // Pointer to PROCESS_INFORMATION structure
-                ) {
-            printf("CreateProcess failed (%d).\n", GetLastError());
-            exit(-1);
-        }
+    cout << endl << "Itering injections, iteration : " << iter << endl;
+    chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    STARTUPINFO si = {sizeof(si)};
 
-        pid_rtos = GetProcessId(pi.hProcess);
-        //opzione1 ->
-
-        long inj_addr;
-        thread injection(injector, pi, objects[chosen], &inj_addr, timer_range);
-        injection.join();
-
-        chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
-
-        //hang handling
-        DWORD hang;
-        hang = WaitForSingleObject(pi.hProcess, gtime.count()*2);
-        if (hang == WAIT_TIMEOUT) { //HANG
-            cout << endl << "Timeot expired, killing process " << endl;
-            TerminateProcess(pi.hProcess, 0);
-
-            logger.addInjection(name, inj_addr, elapsed, "Hang");
-        }
-
-
-        chrono::steady_clock::time_point end = chrono::steady_clock::now();
-
-        chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-        cout << endl << "RTOS iter time : " << rtime.count() << endl;
-
-        int err = 0;
-        if(hang!=WAIT_TIMEOUT)
-            err = checkFiles(objects[chosen].getName(), pid_rtos, inj_addr, elapsed);
-
-        long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
-
-        if(abs(timeDifference) > 1100 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
-            logger.addInjection(name, inj_addr, elapsed, "Delay");
-
-        cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
-
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+    if (!CreateProcess(NULL,   // No module name (use command line)
+                       "./RTOSDemo.exe",        // Command line
+                       NULL,           // Process handle not inheritable
+                       NULL,           // Thread handle not inheritable
+                       FALSE,          // Set handle inheritance to FALSE
+                       0,              // No creation flags
+                       NULL,           // Use parent's environment block
+                       NULL,           // Use parent's starting directory
+                       &si,            // Pointer to STARTUPINFO structure
+                       &pi)           // Pointer to PROCESS_INFORMATION structure
+            ) {
+        printf("CreateProcess failed (%d).\n", GetLastError());
+        exit(-1);
     }
+
+    pid_rtos = GetProcessId(pi.hProcess);
+    //opzione1 ->
+
+    long inj_addr;
+    auto *t = new Target(objects[chosen]);
+    thread injection(injector, pi, objects[chosen], &inj_addr, timer_range);
+    injection.join();
+
+    chrono::duration<long, std::ratio<1, 1000>> elapsed = chrono::duration_cast<std::chrono::milliseconds>(chrono::steady_clock::now() - begin);
+
+    //hang handling
+    DWORD hang;
+    hang = WaitForSingleObject(pi.hProcess, gtime.count()*2);
+    if (hang == WAIT_TIMEOUT) { //HANG
+        cout << endl << "Timeot expired, killing process " << endl;
+        TerminateProcess(pi.hProcess, 0);
+
+        logger.addInjection(reinterpret_cast<Target &>(*t), elapsed, "Hang");
+    }
+
+
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+
+    chrono::duration<long, std::ratio<1, 1000>> rtime = chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+    cout << endl << "RTOS iter time : " << rtime.count() << endl;
+
+    int err = 0;
+    if(hang!=WAIT_TIMEOUT)
+        err = checkFiles(*t, (int)pid_rtos, elapsed);
+
+    long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
+
+    if(abs(timeDifference) > 1100 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
+        logger.addInjection(reinterpret_cast<Target &>(*t), elapsed, "Delay");
+
+    cout << endl << "Time difference = " << to_string(timeDifference) << "[ms]" << endl;
+
+
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 }
@@ -277,7 +280,6 @@ void fillAddresses(){
         cout << "Cannot open rtos.output\n";
         exit(-1);
     }
-    //TODO: order object list
     for(Target& obj : objects){
         char n[100];
         long addr;
@@ -296,6 +298,7 @@ int main(int argc, char **argv) {
     PROCESS_INFORMATION pi;
     chrono::duration<long, ratio<1, 1000>> gtime{};
     menu(chosen, timer_range, numInjection);
+
 
     //If already exist a golden execution, dont start another one
     ifstream gold("../files/Golden_execution.txt");
@@ -317,7 +320,19 @@ int main(int argc, char **argv) {
         }
     }
     gold.close();
-    injectRTOS(pi, numInjection, chosen, timer_range, gtime);
+    fillAddresses();
+#if PARALLELIZATION
+    vector<thread> p(numInjection);
+    for (int iter = 0; iter < numInjection; iter++) {
+        p[iter] = thread(injectRTOS, pi, iter, chosen, timer_range, gtime);
+    }
+    for (int i = 0; i < numInjection; i++) {
+        p[i].join();
+    }
+#else
+    for (int iter = 0; iter < numInjection; iter++)
+        injectRTOS(pi, iter, chosen, timer_range, gtime);
+#endif
 
 #if WRITE_ON_FILE
     logger.logOnfile();

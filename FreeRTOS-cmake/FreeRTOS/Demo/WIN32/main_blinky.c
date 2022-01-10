@@ -137,12 +137,13 @@ static TimerHandle_t xTimer = NULL;
 //TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS; //this is the variable that needs to be modified in order to get a delay
 
 
-void printVars(){
+void printVars() {
     long tasksv[14], timerv[5];
-    FILE* fvars = fopen("rtos.output", "r");
-    if(fvars!=NULL)
+    FILE *fvars = fopen("rtos.output", "r");
+    if (fvars != NULL){
+        fclose(fvars);
         return;
-    fclose(fvars);
+    }
     fvars = fopen("rtos.output", "w");
     int i;
     getTaskVars(tasksv);
@@ -175,7 +176,6 @@ void main_blinky( void )
     DWORD pid = GetCurrentProcessId(); //getpid
     snprintf(falso, 32, "../files/Falso_Dante_%d.txt", (unsigned int)pid);
     printVars();
-    exit(0);
     if( xQueue != NULL )
     {
         fR = fopen("..\\Vero_Dante.txt", "r");
