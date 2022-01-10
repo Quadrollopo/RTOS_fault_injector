@@ -31,6 +31,57 @@ long getRandomAddressInRange(long a1, long a2){
     return (long) address_distribution(generator);
 }
 
+long inject_TCB(fstream& memFile, long address, Target& t){
+    uint8_t h[4];
+    if(t.getName() == "pxCurrentTCB")
+        getAddress(memFile, h, objects[18].getAddress());
+    else
+        getAddress(memFile, h, objects[14].getAddress());
+
+    long tcb = (long) (h[0] + h[1]*256 + h[2]*256*256);
+    if (address > tcb and address < tcb + 8) {
+        cout << "Injecting " << t.getName() << "->pxTopOfStack\n";
+        t.setSubName(t.getName() + "->pxTopOfStack");
+        return address;
+    }
+    else if(address > tcb + 88 and address < tcb + 96) {
+        cout << "Injecting " << t.getName() << "uxPriority\n";
+        t.setSubName(t.getName() + "->uxPriority");
+    }
+    else if (address > tcb + 96 and address < tcb + 104) {
+        t.setSubName(t.getName() + "->pxStack");
+        cout << "Injecting " << t.getName() << "->pxStack\n";
+        getAddress(memFile, h, tcb + 96);
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 70);
+    }
+    else if(address > tcb + 104 and address < tcb + 112) {
+        cout << "Injecting " << t.getName() << "->pcTaskName\n";
+        t.setSubName(t.getName() + "->pcTaskName");
+    }
+    else if(address > tcb + 116 and address < tcb + 124) {
+        cout << "Injecting " << t.getName() << "->uxTCBNumber\n";
+        t.setSubName(t.getName() + "->uxTCBNumber");
+    }
+    else if(address > tcb + 104 and address < tcb + 112) {
+        cout << "Injecting " << t.getName() << "->uxTaskNumber\n";
+        t.setSubName(t.getName() + "->uxTaskNumber");
+    }
+    else if(address > tcb + 112 and address < tcb + 120) {
+        cout << "Injecting " << t.getName() << "->uxBasePriority\n";
+        t.setSubName(t.getName() + "->uxBasePriority");
+    }
+    else if(address > tcb + 120 and address < tcb + 128) {
+        cout << "Injecting " << t.getName() << "->callback\n";
+        t.setSubName(t.getName() + ">callback");
+    }
+    else if(address > tcb + 128 and address < tcb + 136) {
+        cout << "Injecting " << t.getName() << "->ulRunTimeCounter\n";
+        t.setSubName(t.getName() + "->ulRunTimeCounter");
+    }
+    return address;
+}
+
 long inject_timer(fstream& memFile, long address, Target& t){
     uint8_t h[4];
     getAddress(memFile, h, objects[22].getAddress());
@@ -97,6 +148,8 @@ int injector(pid_t pid, Target& t, long *chosenAddr, int timer_range) {
     long addr = address_distribution(generator);
     if(t.getName() == "xTimer")
         addr = inject_timer(memFile, addr, t);
+    else if(t.getName() == "pxCurrentTCB")
+        addr = inject_TCB(memFile, addr, t);
     memFile.seekg(addr);
     byte = memFile.peek();
 
@@ -311,8 +364,8 @@ int main() {
     signal(SIGCHLD, sigCHLDHandler);
     signal(SIGINT, sigINTHandler);
     srand(std::chrono::system_clock::now().time_since_epoch().count());
-    system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space");
-    system("echo \"source ../gdb_stuff/gdb_script\" | sudo gdb freeRTOS");
+    //system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space");
+    system("echo \"source ../gdb_stuff/gdb_script\" | sudo gdb freeRTOS > out; rm out");
 	int chosen, numInjection, timer_range;
 	chrono::duration<long, ratio<1, 1000>> gtime{};
 	menu(chosen, timer_range, numInjection);
@@ -353,6 +406,6 @@ int main() {
 #else
     logger.printInj();
 #endif
-    system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space");
+    //system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space");
 	return 0;
 }
