@@ -16,7 +16,7 @@
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
-#define WRITE_ON_FILE 1
+#define WRITE_ON_FILE 0
 
 using namespace std;
 Logger logger;
@@ -26,7 +26,150 @@ vector<Target> objects = {{"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDela
 static volatile int cnt = 0;
 using namespace std;
 
-int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int timer_range) {
+int getAddress(PROCESS_INFORMATION &pi, uint8_t *h, LPVOID address){
+    if(!ReadProcessMemory(pi.hProcess, address, h, (size_t)4,
+                          NULL)) {
+        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        return -1;
+    }
+}
+
+long getRandomAddressInRange(long a1, long a2){
+    random_device generator;
+    uniform_int_distribution<long> address_distribution = uniform_int_distribution<long>(a1, a2);
+    return (long) address_distribution(generator);
+}
+
+DWORD inject_queue(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    uint8_t h[4];
+    if(t.getName() == "xQueue")
+        getAddress(pi, h, reinterpret_cast<LPVOID>(objects[19].getAddress()));
+    else
+        getAddress(pi, h, reinterpret_cast<LPVOID>(objects[16].getAddress()));
+    long queue = (long) (h[0] + h[1]*256 + h[2]*256*256);
+
+    if (address >= queue && address < queue + 8) {
+        cout << "Injecting " << t.getName() << "->pcHead\n";
+        t.setSubName(t.getName() + "->pcHead");
+        getAddress(pi, h, reinterpret_cast<LPVOID>(queue));
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 50);
+    }
+    else if(address >= queue + 8 && address < queue + 16) {
+        cout << "Injecting " << t.getName() << "pcWriteTo\n";
+        t.setSubName(t.getName() + "->pcWriteTo");
+        getAddress(pi, h, reinterpret_cast<LPVOID>(queue + 8));
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 50);
+    }
+    else if (address >= queue + 120 && address < queue + 128) {
+        cout << "Injecting " << t.getName() << "->uxMessagesWaiting\n";
+        t.setSubName(t.getName() + "->uxMessagesWaiting");
+    }
+    else if(address >= queue + 128 && address < queue + 136) {
+        cout << "Injecting " << t.getName() << "->uxLength\n";
+        t.setSubName(t.getName() + "->uxLength");
+    }
+    else if(address >= queue + 136 && address < queue + 144) {
+        cout << "Injecting " << t.getName() << "->uxItemSize\n";
+        t.setSubName(t.getName() + "->uxItemSize");
+    }
+    return address;
+}
+
+DWORD inject_TCB(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    uint8_t h[4];
+    if(t.getName() == "pxCurrentTCB")
+        getAddress(pi, h, reinterpret_cast<LPVOID>(objects[18].getAddress()));
+    else
+        getAddress(pi, h, reinterpret_cast<LPVOID>(objects[14].getAddress()));
+
+    long tcb = (long) (h[0] + h[1]*256 + h[2]*256*256);
+    if (address >= tcb && address < tcb + 8) {
+        cout << "Injecting " << t.getName() << "->pxTopOfStack\n";
+        t.setSubName(t.getName() + "->pxTopOfStack");
+        return address;
+    }
+    else if(address >= tcb + 88 && address < tcb + 96) {
+        cout << "Injecting " << t.getName() << "uxPriority\n";
+        t.setSubName(t.getName() + "->uxPriority");
+    }
+    else if (address >= tcb + 96 && address < tcb + 104) {
+        t.setSubName(t.getName() + "->pxStack");
+        cout << "Injecting " << t.getName() << "->pxStack\n";
+        getAddress(pi, h, reinterpret_cast<LPVOID>(tcb + 96));
+        long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+        return getRandomAddressInRange(newAddress, newAddress + 70);
+    }
+    else if(address >= tcb + 104 && address < tcb + 112) {
+        cout << "Injecting " << t.getName() << "->pcTaskName\n";
+        t.setSubName(t.getName() + "->pcTaskName");
+    }
+    else if(address >= tcb + 116 && address < tcb + 124) {
+        cout << "Injecting " << t.getName() << "->uxTCBNumber\n";
+        t.setSubName(t.getName() + "->uxTCBNumber");
+    }
+    else if(address >= tcb + 104 && address < tcb + 112) {
+        cout << "Injecting " << t.getName() << "->uxTaskNumber\n";
+        t.setSubName(t.getName() + "->uxTaskNumber");
+    }
+    else if(address >= tcb + 112 && address < tcb + 120) {
+        cout << "Injecting " << t.getName() << "->uxBasePriority\n";
+        t.setSubName(t.getName() + "->uxBasePriority");
+    }
+    else if(address >= tcb + 120 && address < tcb + 128) {
+        cout << "Injecting " << t.getName() << "->callback\n";
+        t.setSubName(t.getName() + ">callback");
+    }
+    else if(address >= tcb + 128 && address < tcb + 136) {
+        cout << "Injecting " << t.getName() << "->ulRunTimeCounter\n";
+        t.setSubName(t.getName() + "->ulRunTimeCounter");
+    }
+    return address;
+}
+
+DWORD inject_timer(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    uint8_t h[4];
+    getAddress(pi, h, reinterpret_cast<LPVOID>(objects[20].getAddress()));
+    long timer = (long) (h[0] + h[1]*256 + h[2]*256*256);
+    if (address >= timer && address < timer + 8) {
+        cout << "Injecting xTimer name\n";
+        t.setSubName("xTimer->name");
+        getAddress(pi, h, reinterpret_cast<LPVOID>(timer));
+        return (long) (h[0] + h[1]*256 + h[2]*256*256);
+    }
+    else if(address >= timer + 8 && address < timer + 48) {
+        cout << "Injecting xTimer->xTimerListItem\n";
+        t.setSubName("xTimer->xTimerListItem");
+        if(address < timer + 16) {
+            t.setSubName("xTimer->xTimerListItem->xItemValue");
+            cout << "Injecting xItemValue\n";
+        }
+        else if (address < timer +  24) {
+            t.setSubName("xTimer->xTimerListItem->pxNext");
+            cout << "Injecting pxNext\n";
+        }
+        else if(address > timer + 40) {
+            t.setSubName("xTimer->xTimerListItem->pvContainer");
+            cout << "Injecting pvContainer\n";
+            getAddress(pi, h, reinterpret_cast<LPVOID>(timer + 40));
+            long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
+            return getRandomAddressInRange(newAddress, newAddress + 40);
+        }
+        return address;
+    }
+    else if (address >= timer + 48 && address < timer + 56) {
+        t.setSubName("xTimer->xTimerPeriodInTicks");
+        cout << "Injecting xTimer->xTimerPeriodInTicks\n";
+    }
+    else if (address >= timer + 64 && address < timer + 72) {
+        t.setSubName("xTimer->callback");
+        cout << "Injecting xTimer callback function\n";
+    }
+    return address;
+}
+
+int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_range) {
     random_device generator;
     uniform_int_distribution<int> time_dist(100, timer_range);
     this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
@@ -51,23 +194,31 @@ int injector(PROCESS_INFORMATION &pi, const Target &t, long *chosenAddr, int tim
 
     DWORD addr = address_distribution(generator);
     SIZE_T length_read = 0;
-    int err = 0;
+    DWORD err = 0;
     if(!ReadProcessMemory(pi.hProcess, (LPVOID)(addr), &byte, (SIZE_T)1,
                       &length_read)) {
         cout << GetLastError();
     }
 
+    if(t.getName() == "xTimer")
+        addr = inject_timer(pi, addr, t);
+    else if(t.getName() == "pxCurrentTCB" || t.getName() == "xTimerTaskHandle")
+        addr = inject_TCB(pi, addr, t);
+    else if(t.getName() == "xQueue" || t.getName() == "xTimerQueue")
+        addr = inject_queue(pi, addr, t);
+    if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &byte, (size_t)1,
+                          NULL)) {
+        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        return -1;
+    }
+
     //Flipbit
     byte ^= 1 << mask;
-    DWORD oldprotect;
-
-    //VirtualProtectEx(pi.hProcess, (LPVOID)addr, 1, PAGE_EXECUTE_READWRITE, &oldprotect);
     if(!WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), (LPVOID)&byte, (SIZE_T)1,
                        &length_read)){
         err = GetLastError();
         cout << err;
     }
-    //VirtualProtectEx(pi.hProcess, (LPVOID)addr, 1, oldprotect, &oldprotect);
 
     cout << "Modified " <<
          // put red color for the bit flipped
@@ -131,7 +282,7 @@ int checkFiles(Target &t, int pid_rtos, chrono::duration<long, std::ratio<1, 100
         return -1;
     }
     s1 = getFileLen("../files/Golden_execution.txt");
-    s2 = getFileLen(("../files/Falso_Dante_" + to_string(pid_rtos) + ".txt").c_str());
+    s2 = getFileLen(fileName.c_str());
 
     if (s2 == 0) { // Crash
         cout << endl << "Files differ in size" << endl << "golden = " << s1 << "; falso = " << s2 << endl;
@@ -277,7 +428,7 @@ void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> 
 void fillAddresses(){
     ifstream file("rtos.output");
     if (!file.is_open()){
-        cout << "Cannot open rtos.output\n";
+        cout << "Cannot open rtos.output (addresses file)\n";
         exit(-1);
     }
     for(Target& obj : objects){
