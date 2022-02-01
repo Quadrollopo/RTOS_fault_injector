@@ -23,14 +23,13 @@ Logger logger;
 //TODO: addresses need to be updated, only the 16th (xTickCount) is correct
 vector<Target> objects = {{"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xActiveTimerList1", 0x00711c08, 40, false}, {"xTimerTaskHandle", 0x00b21c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
 
-static volatile int cnt = 0;
 using namespace std;
 
-int getAddress(PROCESS_INFORMATION &pi, uint8_t *h, LPVOID address){
+void getAddress(PROCESS_INFORMATION &pi, uint8_t *h, LPVOID address){
     if(!ReadProcessMemory(pi.hProcess, address, h, (size_t)4,
-                          NULL)) {
+                          nullptr)) {
         cerr << "Houston we have a problem... " << GetLastError() << endl;
-        return -1;
+        exit(-1);
     }
 }
 
@@ -169,7 +168,7 @@ DWORD inject_timer(PROCESS_INFORMATION &pi, DWORD address, Target& t){
     return address;
 }
 
-int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_range) {
+long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_range) {
     random_device generator;
     uniform_int_distribution<int> time_dist(100, timer_range);
     this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
@@ -184,7 +183,7 @@ int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ran
     else {
         uint8_t h[4];
         if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &h, (size_t)4,
-                              NULL)) {
+                              nullptr)) {
             cerr << "Houston we have a problem... " << GetLastError() << endl;
             return -1;
         }
@@ -197,7 +196,8 @@ int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ran
     DWORD err = 0;
     if(!ReadProcessMemory(pi.hProcess, (LPVOID)(addr), &byte, (SIZE_T)1,
                       &length_read)) {
-        cout << GetLastError();
+        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        return -1;
     }
 
     if(t.getName() == "xTimer")
@@ -207,7 +207,7 @@ int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ran
     else if(t.getName() == "xQueue" || t.getName() == "xTimerQueue")
         addr = inject_queue(pi, addr, t);
     if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &byte, (size_t)1,
-                          NULL)) {
+                          nullptr)) {
         cerr << "Houston we have a problem... " << GetLastError() << endl;
         return -1;
     }
@@ -224,7 +224,7 @@ int injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ran
          // put red color for the bit flipped
          bitset<8>(byte).to_string().insert(8 - mask, COLOR_RESET).insert(7 - mask, COLOR_RED)
          << " at 0x" << hex << addr << endl;
-    *chosenAddr = addr;
+    *chosenAddr = (long) addr;
     cout << hex << *chosenAddr << endl;
     return 0;
 }
@@ -233,10 +233,10 @@ long getFileLen(const char* file) {
     HANDLE h = CreateFile(file,                // name of the write
                        GENERIC_READ,          // open for reading
                        1,                      // do not share
-                       NULL,                   // default security
+                          nullptr,                   // default security
                        OPEN_EXISTING,             //
                        FILE_ATTRIBUTE_NORMAL,  // normal file
-                       NULL);                  // no attr. template
+                          nullptr);                  // no attr. template
     if(h == INVALID_HANDLE_VALUE)
     {
         printf("hFile is NULL\n");
@@ -244,7 +244,7 @@ long getFileLen(const char* file) {
 // return error
         return 4;
     }
-    long len = (long) GetFileSize( h, NULL);
+    long len = (long) GetFileSize( h, nullptr);
     return len;
 }
 
@@ -324,18 +324,18 @@ void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
-    if (!CreateProcess(NULL,   // No module name (use command line)
-                       "./RTOSDemo.exe",        // Command line
-                       NULL,           // Process handle not inheritable
-                       NULL,           // Thread handle not inheritable
+    if (!CreateProcess(nullptr,   // No module name (use command line)
+                       (char *)"./RTOSDemo.exe",        // Command line
+                       nullptr,           // Process handle not inheritable
+                       nullptr,           // Thread handle not inheritable
                        FALSE,          // Set handle inheritance to FALSE
                        0,              // No creation flags
-                       NULL,           // Use parent's environment block
-                       NULL,           // Use parent's starting directory
+                       nullptr,           // Use parent's environment block
+                       nullptr,           // Use parent's starting directory
                        &si,            // Pointer to STARTUPINFO structure
                        &pi)           // Pointer to PROCESS_INFORMATION structure
             ) {
-        printf("CreateProcess failed (%d).\n", GetLastError());
+        printf("CreateProcess failed (%lu).\n", GetLastError());
         exit(-1);
     }
 
@@ -369,7 +369,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, 
     if(hang!=WAIT_TIMEOUT)
         err = checkFiles(*t, (int)pid_rtos, elapsed);
 
-    long timeDifference = chrono::duration_cast<chrono::milliseconds>(rtime - gtime).count();
+    long timeDifference = (rtime - gtime).count();
 
     if(abs(timeDifference) > 1100 && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
         logger.addInjection(reinterpret_cast<Target &>(*t), elapsed, "Delay");
@@ -390,18 +390,18 @@ void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> 
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
     // Start the child process.
-    if (!CreateProcess(NULL,   // No module name (use command line)
-                       "./RTOSDemo.exe",        // Command line
-                       NULL,           // Process handle not inheritable
-                       NULL,           // Thread handle not inheritable
+    if (!CreateProcess(nullptr,   // No module name (use command line)
+                       (char *)"./RTOSDemo.exe",        // Command line
+                       nullptr,           // Process handle not inheritable
+                       nullptr,           // Thread handle not inheritable
                        FALSE,          // Set handle inheritance to FALSE
                        0,              // No creation flags
-                       NULL,           // Use parent's environment block
-                       NULL,           // Use parent's starting directory
+                       nullptr,           // Use parent's environment block
+                       nullptr,           // Use parent's starting directory
                        &si,            // Pointer to STARTUPINFO structure
                        &pi)           // Pointer to PROCESS_INFORMATION structure
             ) {
-        printf("CreateProcess failed (%d).\n", GetLastError());
+        printf("CreateProcess failed (%lu).\n", GetLastError());
         exit(-1);
     }
     pid_golden = GetProcessId(pi.hProcess);
@@ -442,10 +442,8 @@ void fillAddresses(){
     remove("rtos.output");
 }
 
-int main(int argc, char **argv) {
-    int status, status2;
+int main() {
     int chosen, numInjection, timer_range;
-    STARTUPINFO si;
     PROCESS_INFORMATION pi;
     chrono::duration<long, ratio<1, 1000>> gtime{};
     menu(chosen, timer_range, numInjection);
