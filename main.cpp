@@ -13,11 +13,14 @@
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
 
-#define PRINT_ON_FILE 1
+#define PRINT_ON_FILE 0
+#if PARALLELIZATION
+    #define HW_CONCURRENCY_FACTOR 2
+#endif
 
 using namespace std;
 Logger logger;
-vector<Target> objects = {{"xActiveTimerList1", 0x4315e0, 40, false}, {"hMainThread", 0x431ff0, 8, false}, {"xResumeSignals", 0x431e40, 128, false}, {"pxReadyTasksLists", 0x431320, 280, false}, {"xDelayedTaskList1", 0x431440, 40, false}, {"xPendingReadyList", 0x4314c0, 40, false}, {"xSuspendedTaskList", 0x431540, 40, false}, {"uxTopReadyPriority", 0x431578, 8, false}, {"xTickCount", 0x431570, 8, false}, {"xPendedTicks", 0x431588, 8, false}, {"uxSchedulerSuspended", 0x4315b8, 8, false}, {"xNextTaskUnblockTime", 0x4315a8, 8, false}, {"xSchedulerRunning", 0x431580, 8, false}, {"uxTaskNumber", 0x4315a0, 8, false}, {"xTimerTaskHandle", 0x431660, 176, true}, {"xTimerQueue", 0x431658, 168, true}, {"pxOverflowTimerList", 0x431650, 40, true}, {"pxCurrentTimerList", 0x431648, 40, true}, {"pxCurrentTCB", 0x431300, 176, true}, {"pxDelayedTaskList", 0x4314a8, 40, true}, {"xIdleTaskHandle", 0x4315b0, 176, true}, {"xQueue", 0x431d90, 8, true}, {"xTimer", 0x431d98, 88, true}};
+vector<Target> objects = {{"xActiveTimerList1", 0x4315e0, 40, false}, {"hMainThread", 0x431ff0, 8, false}, {"xResumeSignals", 0x431e40, 128, false}, {"pxReadyTasksLists", 0x431320, 280, false}, {"xDelayedTaskList1", 0x431440, 40, false}, {"xPendingReadyList", 0x4314c0, 40, false}, {"xSuspendedTaskList", 0x431540, 40, false}, {"uxTopReadyPriority", 0x431578, 8, false}, {"xTickCount", 0x431570, 8, false}, {"xPendedTicks", 0x431588, 8, false}, {"uxSchedulerSuspended", 0x4315b8, 8, false}, {"xNextTaskUnblockTime", 0x4315a8, 8, false}, {"xSchedulerRunning", 0x431580, 8, false}, {"uxTaskNumber", 0x4315a0, 8, false}, {"xTimerTaskHandle", 0x431660, 176, true}, {"xTimerQueue", 0x431658, 168, true}, {"pxOverflowTimerList", 0x431650, 40, true}, {"pxCurrentTimerList", 0x431648, 40, true}, {"pxCurrentTCB", 0x431300, 176, true}, {"pxDelayedTaskList", 0x4314a8, 40, true}, {"xIdleTaskHandle", 0x4315b0, 176, true}, {"xQueue", 0x431d90, 168, true}, {"xTimer", 0x431d98, 88, true}};
 static volatile int cnt = 0;
 
 void getAddress(fstream& memFile, uint8_t *h, long address){
@@ -31,12 +34,13 @@ long getRandomAddressInRange(long a1, long a2){
     return (long) address_distribution(generator);
 }
 
+long inject_list(fstream& memFile, long address, Target& t){
+    return address;
+}
+
 long inject_queue(fstream& memFile, long address, Target& t){
     uint8_t h[4];
-    if(t.getName() == "xQueue")
-        getAddress(memFile, h, objects[21].getAddress());
-    else
-        getAddress(memFile, h, objects[15].getAddress());
+    getAddress(memFile, h, t.getAddress());
     long queue = (long) (h[0] + h[1]*256 + h[2]*256*256);
 
     if (address >= queue and address < queue + 8) {
@@ -70,10 +74,7 @@ long inject_queue(fstream& memFile, long address, Target& t){
 
 long inject_TCB(fstream& memFile, long address, Target& t){
     uint8_t h[4];
-    if(t.getName() == "pxCurrentTCB")
-        getAddress(memFile, h, objects[18].getAddress());
-    else
-        getAddress(memFile, h, objects[14].getAddress());
+    getAddress(memFile, h, t.getAddress());
 
     long tcb = (long) (h[0] + h[1]*256 + h[2]*256*256);
     if (address >= tcb and address < tcb + 8) {
@@ -311,7 +312,6 @@ void execGolden(chrono::duration<long, ratio<1, 1000>> &gtime) {
 
 void injectRTos(int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime, int iter) {
 	int status;
-	long addr1, addr2;
 	string name = objects[chosen].getName();
 
 	cout << endl << "Itering injections, iteration : " << iter << endl;
@@ -403,38 +403,51 @@ int main() {
     signal(SIGCHLD, sigCHLDHandler);
     signal(SIGINT, sigINTHandler);
     srand(std::chrono::system_clock::now().time_since_epoch().count());
-    system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space");
-    system("echo \"source ../gdb_stuff/gdb_script\" | sudo gdb freeRTOS > out; rm out");
-	int chosen, numInjection, timer_range;
-	chrono::duration<long, ratio<1, 1000>> gtime{};
-	menu(chosen, timer_range, numInjection);
+    system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space > /dev/null 2>&1");
+    system("echo \"source ../gdb_stuff/gdb_script\" | sudo gdb freeRTOS > /dev/null 2>&1");
+    int chosen, numInjection, timer_range;
+    chrono::duration<long, ratio<1, 1000>> gtime{};
+    menu(chosen, timer_range, numInjection);
     fillAddresses();
-	//If already exist a golden execution, dont start another one
-	ifstream gold("../files/Golden_execution.txt");
-	if(!gold) {
-		execGolden(gtime);
-	}else{
-		cout << "Found another golden execution output, skipping execution..." << endl;
-		ifstream time_golden("../files/Time_golden.txt");
-		if (time_golden) {
-			long time;
-			time_golden >> time;
-			gtime = chrono::milliseconds(time);
-			time_golden.close();
-		} else {
-			cout << "Can't open Time_golden.txt: re-exec the golden execution";
-			execGolden(gtime);
-		}
-	}
-	gold.close();
+    //If already exist a golden execution, dont start another one
+    ifstream gold("../files/Golden_execution.txt");
+    if (!gold) {
+        execGolden(gtime);
+    } else {
+        cout << "Found another golden execution output, skipping execution..." << endl;
+        ifstream time_golden("../files/Time_golden.txt");
+        if (time_golden) {
+            long time;
+            time_golden >> time;
+            gtime = chrono::milliseconds(time);
+            time_golden.close();
+        } else {
+            cout << "Can't open Time_golden.txt: re-exec the golden execution";
+            execGolden(gtime);
+        }
+    }
+    gold.close();
 #if PARALLELIZATION
-	vector<thread> p(numInjection);
-	for (int iter = 0; iter < numInjection; iter++) {
-		p[iter] = thread(injectRTos, chosen, timer_range, gtime, iter);
-	}
-	for (int i = 0; i < numInjection; i++) {
-		p[i].join();
-	}
+    int rounds = (int) (numInjection / (HW_CONCURRENCY_FACTOR * thread::hardware_concurrency()));
+    int extra = (int) (numInjection % (HW_CONCURRENCY_FACTOR * thread::hardware_concurrency()));
+    vector<thread> p(HW_CONCURRENCY_FACTOR * thread::hardware_concurrency());
+    for (int r = 0; r < rounds; r++){
+        for (int iter = 0; iter < HW_CONCURRENCY_FACTOR * thread::hardware_concurrency(); iter++) {
+            p[iter] = thread(injectRTos, chosen, timer_range, gtime, iter);
+        }
+        for (int i = 0; i < HW_CONCURRENCY_FACTOR * thread::hardware_concurrency(); i++) {
+            if(p[i].joinable())
+                p[i].join();
+        }
+    }
+    //remaining iterations
+    for (int r = 0; r < extra; r++){
+        p[r] = thread(injectRTos, chosen, timer_range, gtime, r);
+    }
+    for (int r = 0; r < extra; r++){
+        if(p[r].joinable())
+            p[r].join();
+    }
 #else
     for (int iter = 0; iter < numInjection; iter++)
         injectRTos(chosen, timer_range, gtime, iter);
@@ -445,6 +458,6 @@ int main() {
 #else
     logger.printInj();
 #endif
-    system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space");
+    system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space > /dev/null 2>&1");
 	return 0;
 }

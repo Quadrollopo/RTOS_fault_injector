@@ -13,7 +13,7 @@
 #include <fileapi.h>
 #endif
 
-#define PARALLELIZATION 0
+#define PARALLELIZATION 1
 
 using namespace std;
 
