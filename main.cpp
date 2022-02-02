@@ -34,7 +34,55 @@ long getRandomAddressInRange(long a1, long a2){
     return (long) address_distribution(generator);
 }
 
+long inject_list_item(fstream& memFile, long address, Target& t, long baseItem){
+    if (address >= baseItem and address < baseItem + 8) {
+        cout << "Injecting " << t.getName() << "->xItemValue\n";
+        t.setSubName(t.getName() + "->xItemValue");
+    }
+    else if(address >= baseItem + 8 and address < baseItem + 16) {
+        cout << "Injecting " << t.getName() << "->pxNext\n";
+        t.setSubName(t.getName() + "->pxNext");
+    }
+    else if(address >= baseItem + 16 and address < baseItem + 24) {
+        cout << "Injecting " << t.getName() << "->pxPrevious\n";
+        t.setSubName(t.getName() + "->pxPrevious");
+    }
+    else if(address >= baseItem + 24 and address < baseItem + 32) {
+        cout << "Injecting " << t.getName() << "->pvOwner\n";
+        t.setSubName(t.getName() + "->pvOwner");
+    }
+    else if(address >= baseItem + 32 and address < baseItem + 40) {
+        cout << "Injecting " << t.getName() << "->pvContainer\n";
+        t.setSubName(t.getName() + "->pvContainer");
+    }
+    return address;
+}
+
 long inject_list(fstream& memFile, long address, Target& t){
+    long list;
+    if(t.isPointer()) {
+        uint8_t h[4];
+        getAddress(memFile, h, t.getAddress());
+        list = (long) (h[0] + h[1] * 256 + h[2] * 256 * 256);
+    }
+    else
+        list = t.getAddress();
+    if (address >= list and address < list + 8) {
+        cout << "Injecting " << t.getName() << "->uxNumberOfItems\n";
+        t.setSubName(t.getName() + "->uxNumberOfItems");
+    }
+    else if(address >= list + 8 and address < list + 16) {
+        cout << "Injecting " << t.getName() << "->pxNext\n";
+        t.setSubName(t.getName() + "->pxNext");
+        getAddress(memFile, h, list + 8);
+        long baseItem = (long) (h[0] + h[1] * 256 + h[2] * 256 * 256);
+        return inject_list_item(memFile, getRandomAddressInRange(baseItem, baseItem + 40), t, baseItem);
+    }
+    else if (address >= list + 16 and address < list + 40){
+        cout << "Injecting " << t.getName() << "->xListEnd\n";
+        t.setSubName(t.getName() + "->xListEnd");
+        return inject_list_item(memFile, address, t, list + 16);
+    }
     return address;
 }
 
@@ -51,11 +99,27 @@ long inject_queue(fstream& memFile, long address, Target& t){
         return getRandomAddressInRange(newAddress, newAddress + 50);
     }
     else if(address >= queue + 8 and address < queue + 16) {
-        cout << "Injecting " << t.getName() << "pcWriteTo\n";
+        cout << "Injecting " << t.getName() << "->pcWriteTo\n";
         t.setSubName(t.getName() + "->pcWriteTo");
         getAddress(memFile, h, queue + 8);
         long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         return getRandomAddressInRange(newAddress, newAddress + 50);
+    }
+    else if (address >= queue + 32 and address < queue + 72) {
+        cout << "Injecting " << t.getName() << "->xTasksWaitingToSend\n";
+        t.setSubName(t.getName() + "->xTasksWaitingToSend");
+        Target t2(t);
+        t2.setAddress(queue + 32);
+        t2.setPointer(false);
+        return inject_list(memFile, address, t2);
+    }
+    else if (address >= queue + 72 and address < queue + 112) {
+        cout << "Injecting " << t.getName() << "->xTasksWaitingToReceive\n";
+        t.setSubName(t.getName() + "->xTasksWaitingToReceive");
+        Target t2(t);
+        t2.setAddress(queue + 72);
+        t2.setPointer(false);
+        return inject_list(memFile, address, t2);
     }
     else if (address >= queue + 120 and address < queue + 128) {
         cout << "Injecting " << t.getName() << "->uxMessagesWaiting\n";
@@ -190,6 +254,8 @@ int injector(pid_t pid, Target& t, long *chosenAddr, int timer_range) {
         addr = inject_TCB(memFile, addr, t);
     else if(t.getName() == "xQueue" or t.getName() == "xTimerQueue")
         addr = inject_queue(memFile, addr, t);
+    else if(t.getName() == "xActiveTimerList1" or t.getName() == "xDelayedTaskList1" or t.getName() == "xPendingReadyList" or t.getName() == "xSuspendedTaskList" or t.getName() == "pxOverflowTimerList" or t.getName() == "pxCurrentTimerList" or t.getName() == "pxDelayedTaskList")
+        addr = inject_list(memFile, addr, t);
     memFile.seekg(addr);
     byte = memFile.peek();
 

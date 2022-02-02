@@ -43,5 +43,8 @@ public:
         return subName;
     }
 
+    void setPointer(bool pointer) {
+        Target::pointer = pointer;
+    }
 
 };
