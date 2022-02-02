@@ -205,7 +205,7 @@ long inject_timer(fstream& memFile, long address, Target& t){
     long timer = (long) (h[0] + h[1]*256 + h[2]*256*256);
     if (address >= timer and address < timer + 8) {
         cout << "Injecting xTimer name\n";
-        t.setSubName("xTimer->name");
+        t.setSubName("name");
         getAddress(memFile, h, timer);
         return (long) (h[0] + h[1]*256 + h[2]*256*256);
     }

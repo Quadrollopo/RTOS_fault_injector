@@ -109,7 +109,7 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
-#define PARALLELIZATION 0
+#define PARALLELIZATION 1
 
 /*-----------------------------------------------------------*/
 
