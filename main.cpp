@@ -36,24 +36,24 @@ long getRandomAddressInRange(long a1, long a2){
 
 long inject_list_item(fstream& memFile, long address, Target& t, long baseItem){
     if (address >= baseItem and address < baseItem + 8) {
-        cout << "Injecting " << t.getName() << "->xItemValue\n";
-        t.setSubName(t.getName() + "->xItemValue");
+        cout << "Injecting " << t.getSubName() << "->xItemValue\n";
+        t.setSubName(t.getSubName() + "->xItemValue");
     }
     else if(address >= baseItem + 8 and address < baseItem + 16) {
-        cout << "Injecting " << t.getName() << "->pxNext\n";
-        t.setSubName(t.getName() + "->pxNext");
+        cout << "Injecting " << t.getSubName() << "->pxNext\n";
+        t.setSubName(t.getSubName() + "->pxNext");
     }
     else if(address >= baseItem + 16 and address < baseItem + 24) {
-        cout << "Injecting " << t.getName() << "->pxPrevious\n";
-        t.setSubName(t.getName() + "->pxPrevious");
+        cout << "Injecting " << t.getSubName() << "->pxPrevious\n";
+        t.setSubName(t.getSubName() + "->pxPrevious");
     }
     else if(address >= baseItem + 24 and address < baseItem + 32) {
-        cout << "Injecting " << t.getName() << "->pvOwner\n";
-        t.setSubName(t.getName() + "->pvOwner");
+        cout << "Injecting " << t.getSubName() << "->pvOwner\n";
+        t.setSubName(t.getSubName() + "->pvOwner");
     }
     else if(address >= baseItem + 32 and address < baseItem + 40) {
-        cout << "Injecting " << t.getName() << "->pvContainer\n";
-        t.setSubName(t.getName() + "->pvContainer");
+        cout << "Injecting " << t.getSubName() << "->pvContainer\n";
+        t.setSubName(t.getSubName() + "->pvContainer");
     }
     return address;
 }
@@ -68,22 +68,33 @@ long inject_list(fstream& memFile, long address, Target& t){
     else
         list = t.getAddress();
     if (address >= list and address < list + 8) {
-        cout << "Injecting " << t.getName() << "->uxNumberOfItems\n";
-        t.setSubName(t.getName() + "->uxNumberOfItems");
+        cout << "Injecting " << t.getSubName() << "->uxNumberOfItems\n";
+        t.setSubName(t.getSubName() + (t.getSubName().empty() ? "" : "->") + "uxNumberOfItems");
     }
     else if(address >= list + 8 and address < list + 16) {
-        cout << "Injecting " << t.getName() << "->pxNext\n";
-        t.setSubName(t.getName() + "->pxNext");
+        uint8_t h[4];
+        cout << "Injecting " << t.getSubName() << "->pxNext\n";
+        t.setSubName(t.getSubName() + (t.getSubName().empty() ? "" : "->") + "pxNext");
         getAddress(memFile, h, list + 8);
         long baseItem = (long) (h[0] + h[1] * 256 + h[2] * 256 * 256);
         return inject_list_item(memFile, getRandomAddressInRange(baseItem, baseItem + 40), t, baseItem);
     }
     else if (address >= list + 16 and address < list + 40){
-        cout << "Injecting " << t.getName() << "->xListEnd\n";
-        t.setSubName(t.getName() + "->xListEnd");
+        cout << "Injecting " << t.getSubName() << "->xListEnd\n";
+        t.setSubName(t.getSubName() + (t.getSubName().empty() ? "" : "->") + "xListEnd");
         return inject_list_item(memFile, address, t, list + 16);
     }
     return address;
+}
+
+long wrapListInj(fstream& memFile, long address, long base, Target& t, bool isItem){
+    if(!isItem) {
+        t.setAddress(base);
+        t.setPointer(false);
+        return inject_list(memFile, address, t);
+    }
+    else
+        return inject_list_item(memFile, address, t, base);
 }
 
 long inject_queue(fstream& memFile, long address, Target& t){
@@ -93,45 +104,39 @@ long inject_queue(fstream& memFile, long address, Target& t){
 
     if (address >= queue and address < queue + 8) {
         cout << "Injecting " << t.getName() << "->pcHead\n";
-        t.setSubName(t.getName() + "->pcHead");
+        t.setSubName("pcHead");
         getAddress(memFile, h, queue);
         long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         return getRandomAddressInRange(newAddress, newAddress + 50);
     }
     else if(address >= queue + 8 and address < queue + 16) {
         cout << "Injecting " << t.getName() << "->pcWriteTo\n";
-        t.setSubName(t.getName() + "->pcWriteTo");
+        t.setSubName("pcWriteTo");
         getAddress(memFile, h, queue + 8);
         long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
         return getRandomAddressInRange(newAddress, newAddress + 50);
     }
     else if (address >= queue + 32 and address < queue + 72) {
         cout << "Injecting " << t.getName() << "->xTasksWaitingToSend\n";
-        t.setSubName(t.getName() + "->xTasksWaitingToSend");
-        Target t2(t);
-        t2.setAddress(queue + 32);
-        t2.setPointer(false);
-        return inject_list(memFile, address, t2);
+        t.setSubName( "xTasksWaitingToSend");
+        return wrapListInj(memFile, address, queue + 32, t, false);
     }
     else if (address >= queue + 72 and address < queue + 112) {
         cout << "Injecting " << t.getName() << "->xTasksWaitingToReceive\n";
-        t.setSubName(t.getName() + "->xTasksWaitingToReceive");
-        Target t2(t);
-        t2.setAddress(queue + 72);
-        t2.setPointer(false);
-        return inject_list(memFile, address, t2);
+        t.setSubName("xTasksWaitingToReceive");
+        return wrapListInj(memFile, address, queue + 72, t, false);
     }
-    else if (address >= queue + 120 and address < queue + 128) {
+    else if (address >= queue + 112 and address < queue + 120) {
         cout << "Injecting " << t.getName() << "->uxMessagesWaiting\n";
-        t.setSubName(t.getName() + "->uxMessagesWaiting");
+        t.setSubName("uxMessagesWaiting");
+    }
+    else if(address >= queue + 120 and address < queue + 128) {
+        cout << "Injecting " << t.getName() << "->uxLength\n";
+        t.setSubName("uxLength");
     }
     else if(address >= queue + 128 and address < queue + 136) {
-        cout << "Injecting " << t.getName() << "->uxLength\n";
-        t.setSubName(t.getName() + "->uxLength");
-    }
-    else if(address >= queue + 136 and address < queue + 144) {
         cout << "Injecting " << t.getName() << "->uxItemSize\n";
-        t.setSubName(t.getName() + "->uxItemSize");
+        t.setSubName("uxItemSize");
     }
     return address;
 }
@@ -143,15 +148,25 @@ long inject_TCB(fstream& memFile, long address, Target& t){
     long tcb = (long) (h[0] + h[1]*256 + h[2]*256*256);
     if (address >= tcb and address < tcb + 8) {
         cout << "Injecting " << t.getName() << "->pxTopOfStack\n";
-        t.setSubName(t.getName() + "->pxTopOfStack");
+        t.setSubName("pxTopOfStack");
         return address;
     }
+    else if(address >= tcb + 8 and address < tcb + 48) {
+        cout << "Injecting " << t.getName() << "->xStateListItem\n";
+        t.setSubName("xStateListItem");
+        return wrapListInj(memFile, address, tcb + 8, t, true);
+    }
+    else if(address >= tcb + 48 and address < tcb + 88) {
+        cout << "Injecting " << t.getName() << "->xEventListItem\n";
+        t.setSubName("xEventListItem");
+        wrapListInj(memFile, address, tcb + 48, t, true);
+    }
     else if(address >= tcb + 88 and address < tcb + 96) {
-        cout << "Injecting " << t.getName() << "uxPriority\n";
-        t.setSubName(t.getName() + "->uxPriority");
+        cout << "Injecting " << t.getName() << "->uxPriority\n";
+        t.setSubName("uxPriority");
     }
     else if (address >= tcb + 96 and address < tcb + 104) {
-        t.setSubName(t.getName() + "->pxStack");
+        t.setSubName("pxStack");
         cout << "Injecting " << t.getName() << "->pxStack\n";
         getAddress(memFile, h, tcb + 96);
         long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
@@ -159,27 +174,27 @@ long inject_TCB(fstream& memFile, long address, Target& t){
     }
     else if(address >= tcb + 104 and address < tcb + 112) {
         cout << "Injecting " << t.getName() << "->pcTaskName\n";
-        t.setSubName(t.getName() + "->pcTaskName");
+        t.setSubName("pcTaskName");
     }
     else if(address >= tcb + 116 and address < tcb + 124) {
         cout << "Injecting " << t.getName() << "->uxTCBNumber\n";
-        t.setSubName(t.getName() + "->uxTCBNumber");
+        t.setSubName("uxTCBNumber");
     }
     else if(address >= tcb + 104 and address < tcb + 112) {
         cout << "Injecting " << t.getName() << "->uxTaskNumber\n";
-        t.setSubName(t.getName() + "->uxTaskNumber");
+        t.setSubName("uxTaskNumber");
     }
     else if(address >= tcb + 112 and address < tcb + 120) {
         cout << "Injecting " << t.getName() << "->uxBasePriority\n";
-        t.setSubName(t.getName() + "->uxBasePriority");
+        t.setSubName("uxBasePriority");
     }
     else if(address >= tcb + 120 and address < tcb + 128) {
         cout << "Injecting " << t.getName() << "->callback\n";
-        t.setSubName(t.getName() + ">callback");
+        t.setSubName("callback");
     }
     else if(address >= tcb + 128 and address < tcb + 136) {
         cout << "Injecting " << t.getName() << "->ulRunTimeCounter\n";
-        t.setSubName(t.getName() + "->ulRunTimeCounter");
+        t.setSubName("ulRunTimeCounter");
     }
     return address;
 }
@@ -196,30 +211,15 @@ long inject_timer(fstream& memFile, long address, Target& t){
     }
     else if(address >= timer + 8 and address < timer + 48) {
         cout << "Injecting xTimer->xTimerListItem\n";
-        t.setSubName("xTimer->xTimerListItem");
-        if(address < timer + 16) {
-            t.setSubName("xTimer->xTimerListItem->xItemValue");
-            cout << "Injecting xItemValue\n";
-        }
-        else if (address < timer +  24) {
-            t.setSubName("xTimer->xTimerListItem->pxNext");
-            cout << "Injecting pxNext\n";
-        }
-        else if(address > timer + 40) {
-            t.setSubName("xTimer->xTimerListItem->pvContainer");
-            cout << "Injecting pvContainer\n";
-            getAddress(memFile, h, timer + 40);
-            long newAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
-            return getRandomAddressInRange(newAddress, newAddress + 40);
-        }
-        return address;
+        t.setSubName("xTimerListItem");
+        return wrapListInj(memFile, address, timer + 8, t, true);;
     }
     else if (address >= timer + 48 and address < timer + 56) {
-        t.setSubName("xTimer->xTimerPeriodInTicks");
+        t.setSubName("xTimerPeriodInTicks");
         cout << "Injecting xTimer->xTimerPeriodInTicks\n";
     }
     else if (address >= timer + 64 and address < timer + 72) {
-        t.setSubName("xTimer->callback");
+        t.setSubName("callback");
         cout << "Injecting xTimer callback function\n";
     }
     return address;

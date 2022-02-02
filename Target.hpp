@@ -31,20 +31,20 @@ public:
         return pointer;
     }
 
-    void setAddress(long address) {
-        this->address = address;
+    void setAddress(long ad) {
+        this->address = ad;
     }
 
-    void setSubName(const string &subName) {
-        Target::subName = subName;
+    void setSubName(const string &sn) {
+        Target::subName = sn;
     }
 
     const string &getSubName() const {
         return subName;
     }
 
-    void setPointer(bool pointer) {
-        Target::pointer = pointer;
+    void setPointer(bool p) {
+        Target::pointer = p;
     }
 
 };
