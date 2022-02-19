@@ -90,6 +90,7 @@
 #include "timers.h"
 #include "semphr.h"
 #include <unistd.h>
+#include "../../../../config.h"
 /* Local includes. */
 #include "console.h"
 #include <sys/types.h>
@@ -227,7 +228,7 @@ char line[50] = {0};
         res = fgets(line, 50, fR);
         if(res == NULL) vTaskEndScheduler(); //file ended
         msg[1] = line;
-#if !PARALLEL
+#if !PARALLELIZATION
         console_print("Row read from file Vero_Dante\n");
 #endif
         /* Place this task in the blocked state until it is time to run again.
@@ -291,14 +292,14 @@ static void prvQueueReceiveTask( void *pvParameters )
 		if( !strcmp(ulReceivedValue[0], "Task") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
-#if !PARALLEL
+#if !PARALLELIZATION
 			console_print( "Message write on file Falso_Dante\n");
 #endif
 		}
 		else if( !strcmp(ulReceivedValue[0], "Timer") )
 		{
             fprintf(fW, "%s", ulReceivedValue[1]);
-#if !PARALLEL
+#if !PARALLELIZATION
 			console_print( "Message received from software timer\n" );
 #endif
             N++;

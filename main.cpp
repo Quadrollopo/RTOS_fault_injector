@@ -9,14 +9,10 @@
 #include <cstdlib>
 #include <limits>
 #include "Logger.hpp"
+#include "config.h"
 
 #define COLOR_RED     "\x1b[31m"
 #define COLOR_RESET   "\x1b[0m"
-
-#define PRINT_ON_FILE 0
-#if PARALLELIZATION
-    #define HW_CONCURRENCY_FACTOR 2
-#endif
 
 using namespace std;
 Logger logger;
