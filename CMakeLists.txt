@@ -198,6 +198,16 @@ set(FreeRTOS_Source__Include
     "${BASE}/../Source/portable/MSVC-MingW/portmacro.h"
 )
 
+set(FreeRTOS_Source__Source
+	"${BASE}/../Source/croutine.c"
+	"${BASE}/../Source/event_groups.c"
+	"${BASE}/../Source/list.c"
+	"${BASE}/../Source/queue.c"
+	"${BASE}/../Source/stream_buffer.c"
+	"${BASE}/../Source/tasks.c"
+	"${BASE}/../Source/timers.c"
+)
+
 set(FreeRTOS_Source__Source__Portable
     "${BASE}/../Source/portable/MemMang/heap_5.c"
     "${BASE}/../Source/portable/MSVC-MingW/port.c"
