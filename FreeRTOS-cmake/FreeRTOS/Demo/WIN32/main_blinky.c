@@ -90,6 +90,7 @@
 #include "semphr.h"
 /* Local includes. */
 #include <sys/types.h>
+#include "../../../../../config.h"
 
 
 /* Priorities at which the tasks are created. */
@@ -109,7 +110,6 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
-#define PARALLELIZATION 1
 
 /*-----------------------------------------------------------*/
 

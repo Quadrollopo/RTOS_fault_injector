@@ -21,7 +21,7 @@ if(UNIX)
 		#	"Posix_GCC/main_full.c" "Posix_GCC/run-time-stats-utils.c" "Posix_GCC/trcConfig.h" "Posix_GCC/trcSnapshotConfig.h")
 
 	add_executable(freeRTOS "${BASE}/Posix_GCC/main.c" "${BASE}/Posix_GCC/main_blinky.c" "${BASE}/Posix_GCC/code_coverage_additions.c" "${BASE}/Posix_GCC/console.c"
-			"${BASE}/Posix_GCC/main_full.c" "${BASE}/Posix_GCC/run-time-stats-utils.c" "${BASE}/Posix_GCC/trcConfig.h" "${BASE}/Posix_GCC/trcSnapshotConfig.h")
+			"${BASE}/Posix_GCC/main_full.c" "${BASE}/Posix_GCC/run-time-stats-utils.c" "${BASE}/Posix_GCC/trcConfig.h" "${BASE}/Posix_GCC/trcSnapshotConfig.h" config.h)
 
 	target_include_directories(freeRTOS PUBLIC "${FREERTOS_DIR}/Source/include"
 			"${FREERTOS_DIR}/Source/portable/ThirdParty/GCC/Posix"
@@ -125,7 +125,7 @@ endfunction()
 ################################################################################
 project(RTOSDemo C CXX)
 
-add_executable(pds main_win.cpp Logger.hpp Target.hpp)
+add_executable(pds main_win.cpp Logger.hpp Target.hpp config.h)
 
 ################################################################################
 # Source groups
@@ -198,16 +198,6 @@ set(FreeRTOS_Source__Include
     "${BASE}/../Source/portable/MSVC-MingW/portmacro.h"
 )
 
-set(FreeRTOS_Source__Source
-    "${BASE}/../Source/croutine.c"
-    "${BASE}/../Source/event_groups.c"
-    "${BASE}/../Source/list.c"
-    "${BASE}/../Source/queue.c"
-    "${BASE}/../Source/stream_buffer.c"
-    "${BASE}/../Source/tasks.c"
-    "${BASE}/../Source/timers.c"
-)
-
 set(FreeRTOS_Source__Source__Portable
     "${BASE}/../Source/portable/MemMang/heap_5.c"
     "${BASE}/../Source/portable/MSVC-MingW/port.c"
@@ -228,7 +218,7 @@ set(ALL_FILES
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_FILES})
+add_executable(${PROJECT_NAME} ${ALL_FILES} config.h)
 	if(MSVC)
 		target_link_options(RTOSDemo PUBLIC /DYNAMICBASE:NO /BASE:0x400000 /INCREMENTAL:NO /OPT:NOREF)
 	endif()
