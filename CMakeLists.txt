@@ -7,18 +7,13 @@ if(UNIX)
 
 	add_executable(pds main.cpp Logger.hpp Target.hpp)
 
-	#set(FREERTOS_DIR_REL "../../FreeRTOS")
 	set(FREERTOS_DIR_REL "FreeRTOS-cmake/FreeRTOS")
 	get_filename_component(FREERTOS_DIR ${FREERTOS_DIR_REL} ABSOLUTE  )
 
-	#set(FREERTOS_PLUS_DIR_REL "../../FreeRTOS-Plus")
 	set(FREERTOS_PLUS_DIR_REL "FreeRTOS-cmake/FreeRTOS-Plus")
 	get_filename_component(FREERTOS_PLUS_DIR ${FREERTOS_PLUS_DIR_REL} ABSOLUTE  )
 
 	set(BASE "FreeRTOS-cmake/FreeRTOS/Demo")
-
-	#add_executable(freeRTOS "Posix_GCC/main.c" "Posix_GCC/main_andre.c" "Posix_GCC/main_blinky.c" "Posix_GCC/code_coverage_additions.c" "Posix_GCC/console.c"
-		#	"Posix_GCC/main_full.c" "Posix_GCC/run-time-stats-utils.c" "Posix_GCC/trcConfig.h" "Posix_GCC/trcSnapshotConfig.h")
 
 	add_executable(freeRTOS "${BASE}/Posix_GCC/main.c" "${BASE}/Posix_GCC/main_blinky.c" "${BASE}/Posix_GCC/code_coverage_additions.c" "${BASE}/Posix_GCC/console.c"
 			"${BASE}/Posix_GCC/main_full.c" "${BASE}/Posix_GCC/run-time-stats-utils.c" "${BASE}/Posix_GCC/trcConfig.h" "${BASE}/Posix_GCC/trcSnapshotConfig.h" config.h)
@@ -30,7 +25,6 @@ if(UNIX)
 			"${FREERTOS_DIR}/Demo/Posix_GCC"
 			"${FREERTOS_PLUS_DIR}/Source/FreeRTOS-Plus-Trace/Include")
 
-	#aux_source_directory("." SOURCE)
 	aux_source_directory("${FREERTOS_DIR}/Source/" SOURCE)
 
 	target_sources(freeRTOS PUBLIC ${SOURCE}

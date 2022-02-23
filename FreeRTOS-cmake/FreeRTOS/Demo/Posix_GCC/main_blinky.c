@@ -146,8 +146,6 @@ void main_blinky( void )
 {
 const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
 
-	/* Create the queue. */
-	//xQueue = xQueueCreateStatic( mainQUEUE_LENGTH, sizeof( char )*50, ucQueueStorageArea, &xStaticQueue);
     xQueue = xQueueCreate(mainQUEUE_LENGTH, sizeof( char )*50);
     char falso[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int pid = getpid();
@@ -175,7 +173,6 @@ const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
                                          NULL);                            /* The task handle is not required, so NULL is passed. */
 
             xTaskCreate(prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL);
-            //xTaskCreate( mySender, /*prvQueueSendTask,*/ "Sender", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
             /* Create the software timer, but don't start it yet. */
             xTimer = xTimerCreate(
@@ -266,10 +263,6 @@ const char* ulValueToSend[2] = {"Timer", "Message from Timer!\n"};
 
 static void prvQueueReceiveTask( void *pvParameters )
 {
-
-    char string1[8] = "string1";
-    char string2[8] = "string2";
-    char string3[8] = "string3";
     char* ulReceivedValue[2];
     int N = 0;
 	/* Prevent the compiler warning about the unused parameter. */
