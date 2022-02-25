@@ -20,16 +20,16 @@
 
 using namespace std;
 Logger logger;
-//TODO: addresses need to be updated, only the 16th (xTickCount) is correct
 vector<Target> objects = {{"pxReadyTasksLists", 0x00711aa8, 280, false}, {"xDelayedTaskList1", 0x00711a94, 40, false}, {"xPendingReadyList", 0x00711b50, 40, false}, {"xSuspendedTaskList", 0x00711b7c, 40, false}, {"uxTopReadyPriority", 0x00711b98, 8, false}, {"xTickCount", 0x00711b94, 8, false}, {"xPendedTicks", 0x00711ba0, 8, false}, {"uxSchedulerSuspended", 0x00711bb8, 8, false}, {"xNextTaskUnblockTime", 0x00711bb0, 8, false}, {"xSchedulerRunning", 0x00711b9c, 8, false}, {"uxTaskNumber", 0x00711bac, 8, false}, {"pxCurrentTCB", 0x00711a90, 176, true}, {"pxDelayedTaskList", 0x00711b48, 40, true}, {"xIdleTaskHandle", 0x00711bb4, 176, true}, {"xActiveTimerList1", 0x00711c08, 40, false}, {"xTimerTaskHandle", 0x00b21c3c, 176, true}, {"xTimerQueue", 0x00711c38, 168, true}, {"pxOverflowTimerList", 0x00711c34, 40, true}, {"pxCurrentTimerList", 0x00711c30, 40, true}, {"xQueue", 0x00711230, 168, true}, {"xTimer", 0x007118e0, 88, true}};
-
 static volatile int cnt = 0;
+
 using namespace std;
 
 void getAddress(PROCESS_INFORMATION &pi, uint8_t *h, LPVOID address){
+    //read the content of "address" and returns it in the h parameter
     if(!ReadProcessMemory(pi.hProcess, address, h, (size_t)4,
                           nullptr)) {
-        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        cerr << "Error Reading memory 1: " << GetLastError() << endl;
         exit(-1);
     }
 }
@@ -41,6 +41,7 @@ long getRandomAddressInRange(long a1, long a2){
 }
 
 DWORD inject_list_item(PROCESS_INFORMATION &pi, DWORD address, Target& t, DWORD baseItem){
+    //it performs a specific injection for a list_item object, specifying which parameter of the struct has been injected
     if (address >= baseItem && address < baseItem + 8) {
         cout << "Injecting " << t.getSubName() << "->xItemValue\n";
         t.setSubName(t.getSubName() + "->xItemValue");
@@ -65,6 +66,7 @@ DWORD inject_list_item(PROCESS_INFORMATION &pi, DWORD address, Target& t, DWORD 
 }
 
 DWORD inject_list(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    //specific injection for a list object, it can move the file pointer to move within the struct.
     long list;
     if(t.isPointer()) {
         uint8_t h[4];
@@ -94,6 +96,7 @@ DWORD inject_list(PROCESS_INFORMATION &pi, DWORD address, Target& t){
 }
 
 DWORD wrapListInj(PROCESS_INFORMATION &pi, DWORD address, DWORD base, Target& t, bool isItem){
+    //this is just a wrapper for list and list_item injections
     if(!isItem) {
         t.setAddress((long) base);
         t.setPointer(false);
@@ -104,6 +107,7 @@ DWORD wrapListInj(PROCESS_INFORMATION &pi, DWORD address, DWORD base, Target& t,
 }
 
 DWORD inject_queue(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    //specific injection for queues, it can move the file pointer to move within the struct to explore it.
     uint8_t h[4];
     getAddress(pi, h, reinterpret_cast<LPVOID>(t.getAddress()));
     long queue = (long) (h[0] + h[1]*256 + h[2]*256*256);
@@ -149,6 +153,7 @@ DWORD inject_queue(PROCESS_INFORMATION &pi, DWORD address, Target& t){
 }
 
 DWORD inject_TCB(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    //specific injection for TCB, it can move the file pointer to move within the struct.
     uint8_t h[4];
     getAddress(pi, h, reinterpret_cast<LPVOID>(t.getAddress()));
 
@@ -207,6 +212,7 @@ DWORD inject_TCB(PROCESS_INFORMATION &pi, DWORD address, Target& t){
 }
 
 DWORD inject_timer(PROCESS_INFORMATION &pi, DWORD address, Target& t){
+    //specific injection for timers
     uint8_t h[4];
     getAddress(pi, h, reinterpret_cast<LPVOID>(t.getAddress()));
     long timer = (long) (h[0] + h[1]*256 + h[2]*256*256);
@@ -233,9 +239,12 @@ DWORD inject_timer(PROCESS_INFORMATION &pi, DWORD address, Target& t){
 }
 
 long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_range) {
+    //the real injector, given a target t it will choose a random address inside this object and inject it
+    //returns the random address in the chosenAddr parameter.
     random_device generator;
     uniform_int_distribution<int> time_dist(100, timer_range);
-    this_thread::sleep_for(chrono::milliseconds(time_dist(generator)));
+    int millisecond_time = time_dist(generator);
+    this_thread::sleep_for(chrono::milliseconds(millisecond_time));
     cout << "Child starting injector" << endl;
 
     uniform_int_distribution<int> bit_distribution(0, 7);
@@ -248,7 +257,7 @@ long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ra
         uint8_t h[4];
         if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &h, (size_t)4,
                               nullptr)) {
-            cerr << "Houston we have a problem... " << GetLastError() << endl;
+            cerr << "Error reading memory 2: " << GetLastError() << endl;
             return -1;
         }
         long heapAddress = (long) (h[0] + h[1]*256 + h[2]*256*256);
@@ -260,7 +269,7 @@ long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ra
     DWORD err = 0;
     if(!ReadProcessMemory(pi.hProcess, (LPVOID)(addr), &byte, (SIZE_T)1,
                       &length_read)) {
-        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        cerr << "Error reading memory 3: " << GetLastError() << endl;
         return -1;
     }
 
@@ -274,16 +283,16 @@ long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ra
         addr = inject_list(pi, addr, t);
     if(!ReadProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(t.getAddress()), &byte, (size_t)1,
                           nullptr)) {
-        cerr << "Houston we have a problem... " << GetLastError() << endl;
+        cerr << "Error reading memory 4: " << GetLastError() << endl;
         return -1;
     }
 
-    //Flipbit
+    //Bitflip
     byte ^= 1 << mask;
     if(!WriteProcessMemory(pi.hProcess, reinterpret_cast<LPVOID>(addr), (LPVOID)&byte, (SIZE_T)1,
                        &length_read)){
         err = GetLastError();
-        cout << err;
+        cout << "Error writing memory" << err << endl;
     }
 
     cout << "Modified " <<
@@ -292,7 +301,7 @@ long injector(PROCESS_INFORMATION &pi, Target &t, long *chosenAddr, int timer_ra
          << " at 0x" << hex << addr << endl;
     *chosenAddr = (long) addr;
     cout << hex << *chosenAddr << endl;
-    return 0;
+    return millisecond_time;
 }
 
 long getFileLen(const char* file) {
@@ -305,16 +314,18 @@ long getFileLen(const char* file) {
                           nullptr);                  // no attr. template
     if(h == INVALID_HANDLE_VALUE)
     {
+        cout<<GetLastError()<<endl;
         printf("hFile is NULL\n");
-        printf("Could not open golden\n");
+        cout << "Could not open" << file << endl;
 // return error
-        return 4;
+        return 0;
     }
     long len = (long) GetFileSize( h, nullptr);
     return len;
 }
 
 void menu(int &c, int &range, int &numInjection) {
+    //just prints a menu to get the injection's parameters
     cout << "Type what do you want to inject:" << endl;
     for(int i = 0; i < objects.size(); i++)
         cout << i << " - " << objects[i].getName() << endl;
@@ -322,7 +333,6 @@ void menu(int &c, int &range, int &numInjection) {
         cin >> c;
     }while(c >= objects.size() || c < 0);
 
-    // Sta frase non ha molto senso, magari qualcosa in inglese non sarebbe male
     cout << "Insert a range in millisecond to randomly inject:" << endl;
     cin >> range;
     cout << "Number of injection:" << endl;
@@ -330,6 +340,11 @@ void menu(int &c, int &range, int &numInjection) {
 }
 
 int checkFiles(Target &t, int pid_rtos, chrono::duration<long, std::ratio<1, 1000>> elapsed) {
+    //it compares the Golden execution output with the one generated by an instance of RTOS affected by the injection
+    //it will register the type of error found
+    // if output file is empty --> crash
+    // if they differ in some way --> SDC
+    // else --> Masked
     ifstream golden_output("../files/Golden_execution.txt");
     string fileName = "../files/Falso_Dante_" + to_string(pid_rtos) + ".txt";
     ifstream rtos_output(fileName);
@@ -380,6 +395,11 @@ int checkFiles(Target &t, int pid_rtos, chrono::duration<long, std::ratio<1, 100
 }
 
 void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, chrono::duration<long, ratio<1, 1000>> gtime){
+    //this is the function that actually launches an instance of rtos and the injector that will perform the bitflip
+    //after the injection is done it will analyze its results and check which kind of error has been generated.
+    //it uses checkFiles() to look for Crash, SDC and Masked
+    //in order to detect hangs it uses the select() function
+    //delay are detected by measuring the execution time of the RTOS instance.
     DWORD pid_rtos;
     string name = objects[chosen].getName();
 
@@ -436,7 +456,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, 
         err = checkFiles(t, (int)pid_rtos, elapsed);
 
     long timeDifference = (rtime - gtime).count();
-    bool delay = abs(timeDifference) > 750;
+    bool delay = abs(timeDifference) > 1000;
 
     if(delay && hang != WAIT_TIMEOUT && err!=2) //delay detected when there was not a crash or a hang
         logger.addInjection(t, elapsed, "Delay");
@@ -448,6 +468,7 @@ void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, 
 }
 
 void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> &gtime){
+    //launch an instance of RTOS, without performing any injection, then renames the output file as "Golden_execution".
     DWORD pid_golden;
     chrono::steady_clock::time_point bgold = chrono::steady_clock::now();
     STARTUPINFO si = {sizeof(si)};
@@ -492,6 +513,7 @@ void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> 
 }
 
 void fillAddresses(){
+    //it takes the gdb.output file (containing all the addresses of the injectable objects) and updates all the addresses in the object list
     ifstream file("rtos.output");
     if (!file.is_open()){
         cout << "Cannot open rtos.output (addresses file)\n";
