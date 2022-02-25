@@ -470,12 +470,13 @@ void injectRTOS(PROCESS_INFORMATION& pi, int iter, int chosen, int timer_range, 
 void execGolden(PROCESS_INFORMATION& pi, chrono::duration<long, ratio<1, 1000>> &gtime){
     //launch an instance of RTOS, without performing any injection, then renames the output file as "Golden_execution".
     DWORD pid_golden;
-    chrono::steady_clock::time_point bgold = chrono::steady_clock::now();
+
     STARTUPINFO si = {sizeof(si)};
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
+    chrono::steady_clock::time_point bgold = chrono::steady_clock::now();
     // Start the child process.
     if (!CreateProcess(nullptr,   // No module name (use command line)
                        (char *)"./RTOSDemo.exe",        // Command line
